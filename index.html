@@ -132,9 +132,7 @@
     </div>
 
     <script>
-        renderSlider(localMovies.slice(0, 3));
-renderGrid(localMovies, 'moviesGrid');
- = [
+        const localMovies = [
             { 
                 id: 299534, 
                 title: "Avengers: Endgame (Hindi Dubbed)", 
@@ -196,10 +194,9 @@ renderGrid(localMovies, 'moviesGrid');
         let currentTitle = '';
         let serverNum = 1;
 
-        window.onload = () => {
-            renderSlider(localMovies.slice(0, 3));
-            renderGrid(localMovies, 'moviesGrid');
-        };
+        // Directly call execution without window.onload block for mobile browser compatibility
+        renderSlider(localMovies.slice(0, 3));
+        renderGrid(localMovies, 'moviesGrid');
 
         function renderSlider(items) {
             const slider = document.getElementById('heroSlider');
@@ -392,6 +389,4 @@ renderGrid(localMovies, 'moviesGrid');
         function switchTab(tab, el) {
             if(el) {
                 document.querySelectorAll('.bottom-nav .nav-item').forEach(n => n.classList.remove('active'));
-                el.classList.add('active');
-            }
-            if(tab 
+                el.classList.add         
