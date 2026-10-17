@@ -124,7 +124,7 @@
     <div id="settingsSection">
         <div class="section-title" style="margin-left:0; margin-bottom:10px;">App Settings</div>
         <div style="background:#1f1f1f; padding:14px; border-radius:6px; font-size:12px; margin-bottom:10px;">
-            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v3.7</p>
+            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v3.9</p>
             <p style="color:#aaa;">Connected to Live TMDB & Multi-Cloud Streaming Engines.</p>
         </div>
         <button class="server-btn" onclick="localStorage.clear(); alert('Cache cleared successfully!'); renderHistory();">Clear Watch History</button>
@@ -135,7 +135,8 @@
         <div class="nav-item" onclick="switchTab('history', this)"><span>📜 History</span></div>
         <div class="nav-item" onclick="switchTab('midnight', this)"><span>🔥 Midnight</span></div>
         <div class="nav-item" onclick="switchTab('settings', this)"><span>⚙️ Settings</span></div>
-                </div>     <script>
+    </div>
+        <script>
         const API_KEY = "c81928373b67961b782987a052865916";
         let currentId = null;
         let serverNum = 1;
@@ -225,7 +226,6 @@
             currentId = id;
             serverNum = 1;
 
-            // Find movie details from current loaded list or fetch if needed
             let item = currentMovieList.find(m => m.id === id);
             let title = item ? (item.title || item.name) : "Movie Stream";
 
@@ -295,7 +295,7 @@
                     let res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(q)}`);
                     let data = await res.json();
                     let matches = data.results || [];
-                    currentMovieList = [...currentMovieList, ...matches]; // Add to list for lookup
+                    currentMovieList = [...currentMovieList, ...matches];
                     dropdown.innerHTML = '';
                     if(matches.length > 0) {
                         dropdown.style.display = 'block';
