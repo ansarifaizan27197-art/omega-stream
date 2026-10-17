@@ -12,9 +12,9 @@
         .logo { font-size: 16px; font-weight: bold; color: #e50914; cursor: pointer; letter-spacing: 1px; }
         
         .search-container { position: relative; }
-        .search-box input { width: 150px; background: #262626; border: 1px solid #404040; padding: 6px 10px; border-radius: 4px; color: #fff; font-size: 11px; outline: none; }
-        .search-dropdown { position: absolute; top: 32px; right: 0; width: 230px; background: #1f1f1f; border: 1px solid #333; border-radius: 4px; z-index: 200; max-height: 220px; overflow-y: auto; display: none; }
-        .search-suggestion-item { padding: 8px 10px; font-size: 11px; border-bottom: 1px solid #2a2a2a; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .search-box input { width: 160px; background: #262626; border: 1px solid #404040; padding: 6px 10px; border-radius: 4px; color: #fff; font-size: 11px; outline: none; }
+        .search-dropdown { position: absolute; top: 32px; right: 0; width: 240px; background: #1f1f1f; border: 1px solid #333; border-radius: 4px; z-index: 200; max-height: 220px; overflow-y: auto; display: none; }
+        .search-suggestion-item { padding: 9px 12px; font-size: 11px; border-bottom: 1px solid #2a2a2a; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
         .search-suggestion-item:hover { background: #2a2a2a; }
 
         .categories { display: flex; gap: 8px; overflow-x: auto; padding: 10px 16px; background: #141414; scrollbar-width: none; }
@@ -123,8 +123,8 @@
     <div id="settingsSection">
         <div class="section-title" style="margin-left:0; margin-bottom:10px;">App Settings</div>
         <div style="background:#1f1f1f; padding:14px; border-radius:6px; font-size:12px; margin-bottom:10px;">
-            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v4.2 (Optimized)</p>
-            <p style="color:#aaa;">Connected with Fast Cloud Engines.</p>
+            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v4.3 (Fixed Search & Play)</p>
+            <p style="color:#aaa;">Connected with Multi-Server Cloud Engines.</p>
         </div>
         <button class="server-btn" onclick="localStorage.clear(); alert('Cache cleared!'); renderHistory();">Clear Watch History</button>
     </div>
@@ -140,6 +140,7 @@
         let currentId = null;
         let serverNum = 1;
         let currentMovieList = [];
+        let allLoadedMovies = new Map(); // Saari movies ko ID se track karne ke liye
 
         const backupMovies = [
             { id: 299534, title: "Avengers: Endgame", poster_path: "/or06FN3Dka5tukK1e9sl16pB3iy.jpg", backdrop_path: "/7RyHsO4yDXtBv1zUU3mTpHeQ0dZ.jpg" },
@@ -150,9 +151,17 @@
             { id: 383498, title: "Deadpool & Wolverine", poster_path: "/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg", backdrop_path: "/y2Ca1neKKE2mGPMaHzLCNDWFqs4.jpg" }
         ];
 
+        // Backup movies ko map mein daal dein
+        backupMovies.forEach(m => allLoadedMovies.set(m.id, m));
+
         loadCategory('trending');
 
         async function loadCategory(type) {
+            document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+            if(type === 'trending') document.querySelectorAll('.cat-chip')[0].classList.add('active');
+            if(type === 'bollywood') document.querySelectorAll('.cat-chip')[1].classList.add('active');
+            if(type === 'hollywood') document.querySelectorAll('.cat-chip')[2].classList.add('active');
+
             let url = `https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`;
             if(type === 'bollywood') url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_original_language=hi&sort_by=popularity.desc`;
             if(type === 'hollywood') url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_original_language=en&sort_by=popularity.desc`;
@@ -164,6 +173,9 @@
             } catch(e) {
                 currentMovieList = backupMovies;
             }
+
+            // Map mein store karein
+            currentMovieList.forEach(m => allLoadedMovies.set(m.id, m));
 
             let sliderItems = currentMovieList.filter(m => !(m.title && m.title.toLowerCase().includes('endgame'))).slice(0, 3);
             if(sliderItems.length === 0) sliderItems = currentMovieList.slice(0, 3);
@@ -178,6 +190,7 @@
                 let res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(studioName)}`);
                 let data = await res.json();
                 currentMovieList = (data.results && data.results.length > 0) ? data.results : backupMovies;
+                currentMovieList.forEach(m => allLoadedMovies.set(m.id, m));
                 renderGrid(currentMovieList, 'moviesGrid');
             } catch(e) {
                 currentMovieList = backupMovies;
@@ -191,6 +204,7 @@
                 let res = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=27&sort_by=popularity.desc`);
                 let data = await res.json();
                 currentMovieList = (data.results && data.results.length > 0) ? data.results : backupMovies;
+                currentMovieList.forEach(m => allLoadedMovies.set(m.id, m));
                 renderGrid(currentMovieList, 'moviesGrid');
             } catch(e) {
                 currentMovieList = backupMovies;
@@ -242,7 +256,8 @@
             currentId = id;
             serverNum = 1;
 
-            let item = currentMovieList.find(m => m.id === id) || backupMovies.find(m => m.id === id);
+            // Global map se movie details nikalein
+            let item = allLoadedMovies.get(id) || currentMovieList.find(m => m.id === id) || backupMovies.find(m => m.id === id);
             let title = item ? (item.title || item.name) : "Movie Stream";
 
             document.getElementById('homeView').style.display = 'none';
@@ -259,6 +274,7 @@
             saveHistory(id, title);
 
             let recs = currentMovieList.filter(m => m.id !== id);
+            if(recs.length === 0) recs = backupMovies;
             renderGrid(recs.slice(0, 4), 'recommendedGrid');
         }
 
@@ -311,7 +327,10 @@
                     let res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(q)}`);
                     let data = await res.json();
                     let matches = (data.results && data.results.length > 0) ? data.results : [];
-                    currentMovieList = [...currentMovieList, ...matches];
+                    
+                    // Sabhi search matches ko map mein save kar lo taaki click hone par data turant mil jaye
+                    matches.forEach(m => allLoadedMovies.set(m.id, m));
+
                     dropdown.innerHTML = '';
                     if(matches.length > 0) {
                         dropdown.style.display = 'block';
@@ -408,4 +427,5 @@
         }
     </script>
 </body>
-</html>
+    </html>
+    
