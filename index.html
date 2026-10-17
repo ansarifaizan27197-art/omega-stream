@@ -12,7 +12,7 @@
         .logo { font-size: 16px; font-weight: bold; color: #e50914; cursor: pointer; letter-spacing: 1px; }
         
         .search-container { position: relative; }
-        .search-box input { width: 160px; background: #262626; border: 1px solid #404040; padding: 6px 10px; border-radius: 4px; color: #fff; font-size: 11px; outline: none; }
+        .search-box input { width: 150px; background: #262626; border: 1px solid #404040; padding: 6px 10px; border-radius: 4px; color: #fff; font-size: 11px; outline: none; }
         .search-dropdown { position: absolute; top: 32px; right: 0; width: 230px; background: #1f1f1f; border: 1px solid #333; border-radius: 4px; z-index: 200; max-height: 220px; overflow-y: auto; display: none; }
         .search-suggestion-item { padding: 8px 10px; font-size: 11px; border-bottom: 1px solid #2a2a2a; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .search-suggestion-item:hover { background: #2a2a2a; }
@@ -57,7 +57,7 @@
         .watch-title { font-size: 18px; font-weight: bold; margin-bottom: 6px; color: #fff; }
         .watch-meta { font-size: 11px; color: #aaa; margin-bottom: 14px; }
 
-        #historySection { display: none; padding: 16px; }
+        #historySection, #settingsSection { display: none; padding: 16px; }
         .history-item { display: flex; align-items: center; justify-content: space-between; background: #1f1f1f; padding: 12px; border-radius: 6px; margin-bottom: 8px; border: 1px solid #2a2a2a; }
         .del-btn { background: #e50914; color: #fff; border: none; padding: 6px 10px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold; }
 
@@ -72,7 +72,7 @@
         <div class="logo" onclick="goHome()">OMEGA STREAM</div>
         <div class="search-container">
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Search any movie..." oninput="handleSearchInput()" autocomplete="off">
+                <input type="text" id="searchInput" placeholder="Search movies, series..." oninput="handleSearchInput()" autocomplete="off">
             </div>
             <div id="searchDropdown" class="search-dropdown"></div>
         </div>
@@ -80,21 +80,23 @@
 
     <div id="homeView">
         <div class="categories">
-            <div class="cat-chip active" onclick="fetchMovies('trending', this)">Trending / All</div>
-            <div class="cat-chip" onclick="fetchMovies('popular', this)">Popular Movies</div>
-            <div class="cat-chip" onclick="fetchMovies('top_rated', this)">Top Rated</div>
+            <div class="cat-chip active" onclick="fetchCategoryMovies('trending', this)">Trending</div>
+            <div class="cat-chip" onclick="fetchCategoryMovies('bollywood', this)">Bollywood</div>
+            <div class="cat-chip" onclick="fetchCategoryMovies('south', this)">South Indian</div>
+            <div class="cat-chip" onclick="fetchCategoryMovies('hollywood', this)">Hollywood</div>
         </div>
 
         <div class="hero-slider" id="heroSlider"></div>
 
-        <div class="section-title">Studios</div>
+        <div class="section-title">Studios & Genres</div>
         <div class="studios-row">
-            <div class="studio-btn" onclick="fetchStudio('Marvel')">Marvel</div>
-            <div class="studio-btn" onclick="fetchStudio('Sci-Fi')">Sci-Fi</div>
-            <div class="studio-btn" onclick="fetchStudio('Thriller')">Thriller</div>
+            <div class="studio-btn" onclick="fetchStudioMovies('Marvel')">Marvel</div>
+            <div class="studio-btn" onclick="fetchStudioMovies('Sci-Fi')">Sci-Fi</div>
+            <div class="studio-btn" onclick="fetchStudioMovies('Action')">Action</div>
+            <div class="studio-btn" onclick="fetchStudioMovies('Thriller')">Thriller</div>
         </div>
 
-        <div class="section-title" id="gridTitle">Trending Movies</div>
+        <div class="section-title" id="gridTitle">Trending Masterpieces</div>
         <div class="movies-grid" id="moviesGrid"></div>
     </div>
 
@@ -119,16 +121,20 @@
         <div id="historyList"></div>
     </div>
 
+    <div id="settingsSection">
+        <div class="section-title" style="margin-left:0; margin-bottom:10px;">App Settings</div>
+        <div style="background:#1f1f1f; padding:14px; border-radius:6px; font-size:12px; margin-bottom:10px;">
+            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v3.6</p>
+            <p style="color:#aaa;">Connected to Live TMDB & Multi-Cloud Streaming Engines.</p>
+        </div>
+        <button class="server-btn" onclick="localStorage.clear(); alert('Cache cleared successfully!'); renderHistory();">Clear Watch History</button>
+    </div>
+
     <div class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('home', this)">
-            <span>🏠 Home</span>
-        </div>
-        <div class="nav-item" onclick="switchTab('history', this)">
-            <span>📜 History</span>
-        </div>
-        <div class="nav-item" onclick="switchTab('midnight', this)">
-            <span>🔥 Midnight</span>
-        </div>
+        <div class="nav-item active" onclick="switchTab('home', this)"><span>🏠 Home</span></div>
+        <div class="nav-item" onclick="switchTab('history', this)"><span>📜 History</span></div>
+        <div class="nav-item" onclick="switchTab('midnight', this)"><span>🔥 Midnight</span></div>
+        <div class="nav-item" onclick="switchTab('settings', this)"><span>⚙️ Settings</span></div>
     </div>
         <script>
         const API_KEY = "c81928373b67961b782987a052865916";
@@ -136,29 +142,41 @@
         let serverNum = 1;
         let allMoviesData = [];
 
-        fetchMovies('trending');
+        fetchCategoryMovies('trending');
 
-        async function fetchMovies(type) {
+        async function fetchCategoryMovies(cat) {
             let url = `https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`;
-            if(type === 'popular') url = `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`;
-            if(type === 'top_rated') url = `https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}`;
+            if(cat === 'bollywood') url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_original_language=hi&sort_by=popularity.desc`;
+            if(cat === 'south') url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_original_language=te|ta|ml|kn&sort_by=popularity.desc`;
+            if(cat === 'hollywood') url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_original_language=en&sort_by=popularity.desc`;
 
             try {
                 let res = await fetch(url);
                 let data = await res.json();
                 allMoviesData = data.results || [];
-                renderSlider(allMoviesData.slice(0, 3));
+                
+                // Slider mein Endgame ko skip karke baaki trending movies dikhayenge
+                let sliderItems = allMoviesData.filter(m => !(m.title && m.title.toLowerCase().includes('endgame'))).slice(0, 3);
+                renderSlider(sliderItems);
                 renderGrid(allMoviesData, 'moviesGrid');
             } catch(e) { console.error(e); }
         }
 
-        async function fetchStudio(studioName) {
+        async function fetchStudioMovies(studio) {
             document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
-            document.getElementById('gridTitle').innerText = `${studioName} Collection`;
-            
-            let query = studioName;
+            document.getElementById('gridTitle').innerText = `${studio} Collection`;
             try {
-                let res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
+                let res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(studio)}`);
+                let data = await res.json();
+                let results = data.results || [];
+                renderGrid(results, 'moviesGrid');
+            } catch(e) { console.error(e); }
+        }
+
+        async function fetchMidnightContent() {
+            document.getElementById('gridTitle').innerText = "🔥 Midnight Horror & Adult Zone (18+)";
+            try {
+                let res = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=27&sort_by=popularity.desc`);
                 let data = await res.json();
                 let results = data.results || [];
                 renderGrid(results, 'moviesGrid');
@@ -211,6 +229,7 @@
 
             document.getElementById('homeView').style.display = 'none';
             document.getElementById('historySection').style.display = 'none';
+            document.getElementById('settingsSection').style.display = 'none';
             document.getElementById('searchDropdown').style.display = 'none';
             document.getElementById('watchView').style.display = 'block';
 
@@ -221,7 +240,8 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
             saveHistory(id, title);
 
-            renderGrid(allMoviesData.filter(m => m.id !== id).slice(0, 4), 'recommendedGrid');
+            let recs = allMoviesData.filter(m => m.id !== id);
+            renderGrid(recs.slice(0, 4), 'recommendedGrid');
         }
 
         function loadPlayer() {
@@ -256,6 +276,7 @@
         function goHome() {
             document.getElementById('watchView').style.display = 'none';
             document.getElementById('historySection').style.display = 'none';
+            document.getElementById('settingsSection').style.display = 'none';
             document.getElementById('searchDropdown').style.display = 'none';
             document.getElementById('homeView').style.display = 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -307,9 +328,7 @@
             const list = document.getElementById('historyList');
             if(!list) return;
             let hist = [];
-            try {
-                hist = JSON.parse(localStorage.getItem('omega_history') || '[]');
-            } catch(e) {}
+            try { hist = JSON.parse(localStorage.getItem('omega_history') || '[]'); } catch(e) {}
             
             list.innerHTML = hist.length === 0 ? '<p style="font-size:11px; color:#808080;">No history found.</p>' : '';
             hist.forEach(item => {
@@ -343,17 +362,29 @@
             } else if(tab === 'history') {
                 document.getElementById('homeView').style.display = 'none';
                 document.getElementById('watchView').style.display = 'none';
+                document.getElementById('settingsSection').style.display = 'none';
                 document.getElementById('searchDropdown').style.display = 'none';
                 document.getElementById('historySection').style.display = 'block';
                 renderHistory();
             } else if(tab === 'midnight') {
                 let pass = prompt("🔥 Enter Midnight Mode Password (18+):");
-                if(pass === "18" || pass === "omega18" || pass === "admin") {
-                    alert("⚠️ Welcome to Midnight Special Stream Zone!");
+                if(pass === "omega18") {
+                    document.getElementById('homeView').style.display = 'none';
+                    document.getElementById('watchView').style.display = 'none';
+                    document.getElementById('historySection').style.display = 'none';
+                    document.getElementById('searchDropdown').style.display = 'none';
+                    document.getElementById('settingsSection').style.display = 'none';
+                    fetchMidnightContent();
                 } else {
                     alert("❌ Incorrect Password!");
+                    goHome();
                 }
-                goHome();
+            } else if(tab === 'settings') {
+                document.getElementById('homeView').style.display = 'none';
+                document.getElementById('watchView').style.display = 'none';
+                document.getElementById('historySection').style.display = 'none';
+                document.getElementById('searchDropdown').style.display = 'none';
+                document.getElementById('settingsSection').style.display = 'block';
             }
         }
     </script>
