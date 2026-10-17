@@ -82,7 +82,6 @@
         <div class="categories">
             <div class="cat-chip active" onclick="loadCategory('trending', this)">Trending</div>
             <div class="cat-chip" onclick="loadCategory('bollywood', this)">Bollywood</div>
-            <div class="cat-chip" onclick="loadCategory('south', this)">South Indian</div>
             <div class="cat-chip" onclick="loadCategory('hollywood', this)">Hollywood</div>
         </div>
 
@@ -124,8 +123,8 @@
     <div id="settingsSection">
         <div class="section-title" style="margin-left:0; margin-bottom:10px;">App Settings</div>
         <div style="background:#1f1f1f; padding:14px; border-radius:6px; font-size:12px; margin-bottom:10px;">
-            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v4.1 (Safe Fallback)</p>
-            <p style="color:#aaa;">Connected with Multi-Cloud & Local Backup Engines.</p>
+            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v4.2 (Optimized)</p>
+            <p style="color:#aaa;">Connected with Fast Cloud Engines.</p>
         </div>
         <button class="server-btn" onclick="localStorage.clear(); alert('Cache cleared!'); renderHistory();">Clear Watch History</button>
     </div>
@@ -142,8 +141,7 @@
         let serverNum = 1;
         let currentMovieList = [];
 
-        // Safe Backup Data taaki API fail hone par bhi app chal sake
-        const fallbackMovies = [
+        const backupMovies = [
             { id: 299534, title: "Avengers: Endgame", poster_path: "/or06FN3Dka5tukK1e9sl16pB3iy.jpg", backdrop_path: "/7RyHsO4yDXtBv1zUU3mTpHeQ0dZ.jpg" },
             { id: 157336, title: "Interstellar", poster_path: "/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg", backdrop_path: "/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg" },
             { id: 550, title: "Fight Club", poster_path: "/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg", backdrop_path: "/hZkgoQYus5vegHoetLkCJzb17zJ.jpg" },
@@ -157,17 +155,14 @@
         async function loadCategory(type) {
             let url = `https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`;
             if(type === 'bollywood') url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_original_language=hi&sort_by=popularity.desc`;
-            if(type === 'south') url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_original_language=te|ta|ml|kn&sort_by=popularity.desc`;
             if(type === 'hollywood') url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_original_language=en&sort_by=popularity.desc`;
 
             try {
                 let res = await fetch(url);
-                if(!res.ok) throw new Error("API Network response failed");
                 let data = await res.json();
-                currentMovieList = (data.results && data.results.length > 0) ? data.results : fallbackMovies;
+                currentMovieList = (data.results && data.results.length > 0) ? data.results : backupMovies;
             } catch(e) {
-                console.warn("API Fetch failed, switching to backup fallback list:", e);
-                currentMovieList = fallbackMovies;
+                currentMovieList = backupMovies;
             }
 
             let sliderItems = currentMovieList.filter(m => !(m.title && m.title.toLowerCase().includes('endgame'))).slice(0, 3);
@@ -182,10 +177,10 @@
             try {
                 let res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(studioName)}`);
                 let data = await res.json();
-                currentMovieList = (data.results && data.results.length > 0) ? data.results : fallbackMovies;
+                currentMovieList = (data.results && data.results.length > 0) ? data.results : backupMovies;
                 renderGrid(currentMovieList, 'moviesGrid');
             } catch(e) {
-                currentMovieList = fallbackMovies;
+                currentMovieList = backupMovies;
                 renderGrid(currentMovieList, 'moviesGrid');
             }
         }
@@ -195,10 +190,10 @@
             try {
                 let res = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=27&sort_by=popularity.desc`);
                 let data = await res.json();
-                currentMovieList = (data.results && data.results.length > 0) ? data.results : fallbackMovies;
+                currentMovieList = (data.results && data.results.length > 0) ? data.results : backupMovies;
                 renderGrid(currentMovieList, 'moviesGrid');
             } catch(e) {
-                currentMovieList = fallbackMovies;
+                currentMovieList = backupMovies;
                 renderGrid(currentMovieList, 'moviesGrid');
             }
         }
@@ -209,7 +204,7 @@
             slider.innerHTML = '';
             items.forEach(item => {
                 let title = item.title || item.name || "Movie";
-                let backdrop = item.backdrop_path ? `https://image.tmdb.org/t/p/w1280${item.backdrop_path}` : 'https://via.placeholder.com/1280x720/1f1f1f/ffffff?text=Omega+Stream';
+                let backdrop = item.backdrop_path ? `https://image.tmdb.org/t/p/w1280${item.backdrop_path}` : '';
                 const banner = document.createElement('div');
                 banner.className = 'hero-banner';
                 banner.innerHTML = `
@@ -247,7 +242,7 @@
             currentId = id;
             serverNum = 1;
 
-            let item = currentMovieList.find(m => m.id === id) || fallbackMovies.find(m => m.id === id);
+            let item = currentMovieList.find(m => m.id === id) || backupMovies.find(m => m.id === id);
             let title = item ? (item.title || item.name) : "Movie Stream";
 
             document.getElementById('homeView').style.display = 'none';
