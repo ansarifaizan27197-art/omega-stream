@@ -124,7 +124,7 @@
     <div id="settingsSection">
         <div class="section-title" style="margin-left:0; margin-bottom:10px;">App Settings</div>
         <div style="background:#1f1f1f; padding:14px; border-radius:6px; font-size:12px; margin-bottom:10px;">
-            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v3.6</p>
+            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v3.7</p>
             <p style="color:#aaa;">Connected to Live TMDB & Multi-Cloud Streaming Engines.</p>
         </div>
         <button class="server-btn" onclick="localStorage.clear(); alert('Cache cleared successfully!'); renderHistory();">Clear Watch History</button>
@@ -135,12 +135,11 @@
         <div class="nav-item" onclick="switchTab('history', this)"><span>📜 History</span></div>
         <div class="nav-item" onclick="switchTab('midnight', this)"><span>🔥 Midnight</span></div>
         <div class="nav-item" onclick="switchTab('settings', this)"><span>⚙️ Settings</span></div>
-    </div>
-        <script>
+                </div>     <script>
         const API_KEY = "c81928373b67961b782987a052865916";
         let currentId = null;
         let serverNum = 1;
-        let allMoviesData = [];
+        let currentMovieList = [];
 
         fetchCategoryMovies('trending');
 
@@ -153,12 +152,11 @@
             try {
                 let res = await fetch(url);
                 let data = await res.json();
-                allMoviesData = data.results || [];
+                currentMovieList = data.results || [];
                 
-                // Slider mein Endgame ko skip karke baaki trending movies dikhayenge
-                let sliderItems = allMoviesData.filter(m => !(m.title && m.title.toLowerCase().includes('endgame'))).slice(0, 3);
+                let sliderItems = currentMovieList.filter(m => !(m.title && m.title.toLowerCase().includes('endgame'))).slice(0, 3);
                 renderSlider(sliderItems);
-                renderGrid(allMoviesData, 'moviesGrid');
+                renderGrid(currentMovieList, 'moviesGrid');
             } catch(e) { console.error(e); }
         }
 
@@ -168,8 +166,8 @@
             try {
                 let res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(studio)}`);
                 let data = await res.json();
-                let results = data.results || [];
-                renderGrid(results, 'moviesGrid');
+                currentMovieList = data.results || [];
+                renderGrid(currentMovieList, 'moviesGrid');
             } catch(e) { console.error(e); }
         }
 
@@ -178,8 +176,8 @@
             try {
                 let res = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=27&sort_by=popularity.desc`);
                 let data = await res.json();
-                let results = data.results || [];
-                renderGrid(results, 'moviesGrid');
+                currentMovieList = data.results || [];
+                renderGrid(currentMovieList, 'moviesGrid');
             } catch(e) { console.error(e); }
         }
 
@@ -196,7 +194,7 @@
                     <img class="hero-img" src="${backdrop}" alt="${title}">
                     <div class="hero-overlay">
                         <div class="hero-title">${title}</div>
-                        <div class="play-btn" onclick="openWatchView(${item.id}, '${title.replace(/'/g, "")}')">▶ Play Now</div>
+                        <div class="play-btn" onclick="openWatchById(${item.id})">▶ Play Now</div>
                     </div>
                 `;
                 slider.appendChild(banner);
@@ -212,7 +210,7 @@
                 let poster = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : 'https://via.placeholder.com/300x450/1f1f1f/ffffff?text=Omega+Stream';
                 const card = document.createElement('div');
                 card.className = 'movie-card';
-                card.onclick = () => openWatchView(item.id, title.replace(/'/g, ""));
+                card.onclick = () => openWatchById(item.id);
                 card.innerHTML = `
                     <img src="${poster}" alt="${title}" onerror="this.src='https://via.placeholder.com/300x450/1f1f1f/ffffff?text=Omega+Stream'">
                     <div class="movie-info">
@@ -223,9 +221,13 @@
             });
         }
 
-        function openWatchView(id, title) {
+        async function openWatchById(id) {
             currentId = id;
             serverNum = 1;
+
+            // Find movie details from current loaded list or fetch if needed
+            let item = currentMovieList.find(m => m.id === id);
+            let title = item ? (item.title || item.name) : "Movie Stream";
 
             document.getElementById('homeView').style.display = 'none';
             document.getElementById('historySection').style.display = 'none';
@@ -240,7 +242,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
             saveHistory(id, title);
 
-            let recs = allMoviesData.filter(m => m.id !== id);
+            let recs = currentMovieList.filter(m => m.id !== id);
             renderGrid(recs.slice(0, 4), 'recommendedGrid');
         }
 
@@ -293,6 +295,7 @@
                     let res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(q)}`);
                     let data = await res.json();
                     let matches = data.results || [];
+                    currentMovieList = [...currentMovieList, ...matches]; // Add to list for lookup
                     dropdown.innerHTML = '';
                     if(matches.length > 0) {
                         dropdown.style.display = 'block';
@@ -304,7 +307,7 @@
                             div.onclick = () => {
                                 inputEl.value = '';
                                 dropdown.style.display = 'none';
-                                openWatchView(item.id, title.replace(/'/g, ""));
+                                openWatchById(item.id);
                             };
                             dropdown.appendChild(div);
                         });
@@ -335,7 +338,7 @@
                 const div = document.createElement('div');
                 div.className = 'history-item';
                 div.innerHTML = `
-                    <div onclick="openWatchView(${item.id}, '${item.title}')" style="cursor:pointer; flex:1;">
+                    <div onclick="openWatchById(${item.id})" style="cursor:pointer; flex:1;">
                         <div style="font-size:11px; font-weight:bold;">${item.title}</div>
                         <div style="font-size:9px; color:#808080;">MOVIE • ${item.date}</div>
                     </div>
