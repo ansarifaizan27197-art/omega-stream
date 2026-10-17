@@ -124,8 +124,8 @@
     <div id="settingsSection">
         <div class="section-title" style="margin-left:0; margin-bottom:10px;">App Settings</div>
         <div style="background:#1f1f1f; padding:14px; border-radius:6px; font-size:12px; margin-bottom:10px;">
-            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v4.0</p>
-            <p style="color:#aaa;">Connected to Live TMDB Streaming Engines.</p>
+            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v4.1 (Safe Fallback)</p>
+            <p style="color:#aaa;">Connected with Multi-Cloud & Local Backup Engines.</p>
         </div>
         <button class="server-btn" onclick="localStorage.clear(); alert('Cache cleared!'); renderHistory();">Clear Watch History</button>
     </div>
@@ -135,12 +135,22 @@
         <div class="nav-item" onclick="switchTab('history', this)"><span>📜 History</span></div>
         <div class="nav-item" onclick="switchTab('midnight', this)"><span>🔥 Midnight</span></div>
         <div class="nav-item" onclick="switchTab('settings', this)"><span>⚙️ Settings</span></div>
-        </div>
-            <script>
+    </div>
+        <script>
         const API_KEY = "c81928373b67961b782987a052865916";
         let currentId = null;
         let serverNum = 1;
         let currentMovieList = [];
+
+        // Safe Backup Data taaki API fail hone par bhi app chal sake
+        const fallbackMovies = [
+            { id: 299534, title: "Avengers: Endgame", poster_path: "/or06FN3Dka5tukK1e9sl16pB3iy.jpg", backdrop_path: "/7RyHsO4yDXtBv1zUU3mTpHeQ0dZ.jpg" },
+            { id: 157336, title: "Interstellar", poster_path: "/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg", backdrop_path: "/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg" },
+            { id: 550, title: "Fight Club", poster_path: "/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg", backdrop_path: "/hZkgoQYus5vegHoetLkCJzb17zJ.jpg" },
+            { id: 634649, title: "Spider-Man: No Way Home", poster_path: "/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg", backdrop_path: "/iQFcwSGbZXMkeyKrxbPnwnRo5fl.jpg" },
+            { id: 27205, title: "Inception", poster_path: "/edv5CZvWj09upOsy2Y6IwDhK8bt.jpg", backdrop_path: "/s3TBrRGB1iv7gOCQz0VnICnDqWp.jpg" },
+            { id: 383498, title: "Deadpool & Wolverine", poster_path: "/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg", backdrop_path: "/y2Ca1neKKE2mGPMaHzLCNDWFqs4.jpg" }
+        ];
 
         loadCategory('trending');
 
@@ -152,13 +162,18 @@
 
             try {
                 let res = await fetch(url);
+                if(!res.ok) throw new Error("API Network response failed");
                 let data = await res.json();
-                currentMovieList = data.results || [];
-                
-                let sliderItems = currentMovieList.filter(m => !(m.title && m.title.toLowerCase().includes('endgame'))).slice(0, 3);
-                renderSlider(sliderItems);
-                renderGrid(currentMovieList, 'moviesGrid');
-            } catch(e) { console.error("Error loading category:", e); }
+                currentMovieList = (data.results && data.results.length > 0) ? data.results : fallbackMovies;
+            } catch(e) {
+                console.warn("API Fetch failed, switching to backup fallback list:", e);
+                currentMovieList = fallbackMovies;
+            }
+
+            let sliderItems = currentMovieList.filter(m => !(m.title && m.title.toLowerCase().includes('endgame'))).slice(0, 3);
+            if(sliderItems.length === 0) sliderItems = currentMovieList.slice(0, 3);
+            renderSlider(sliderItems);
+            renderGrid(currentMovieList, 'moviesGrid');
         }
 
         async function loadStudio(studioName) {
@@ -167,9 +182,12 @@
             try {
                 let res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(studioName)}`);
                 let data = await res.json();
-                currentMovieList = data.results || [];
+                currentMovieList = (data.results && data.results.length > 0) ? data.results : fallbackMovies;
                 renderGrid(currentMovieList, 'moviesGrid');
-            } catch(e) { console.error("Error loading studio:", e); }
+            } catch(e) {
+                currentMovieList = fallbackMovies;
+                renderGrid(currentMovieList, 'moviesGrid');
+            }
         }
 
         async function loadMidnight() {
@@ -177,9 +195,12 @@
             try {
                 let res = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=27&sort_by=popularity.desc`);
                 let data = await res.json();
-                currentMovieList = data.results || [];
+                currentMovieList = (data.results && data.results.length > 0) ? data.results : fallbackMovies;
                 renderGrid(currentMovieList, 'moviesGrid');
-            } catch(e) { console.error("Error loading midnight:", e); }
+            } catch(e) {
+                currentMovieList = fallbackMovies;
+                renderGrid(currentMovieList, 'moviesGrid');
+            }
         }
 
         function renderSlider(items) {
@@ -188,7 +209,7 @@
             slider.innerHTML = '';
             items.forEach(item => {
                 let title = item.title || item.name || "Movie";
-                let backdrop = item.backdrop_path ? `https://image.tmdb.org/t/p/w1280${item.backdrop_path}` : '';
+                let backdrop = item.backdrop_path ? `https://image.tmdb.org/t/p/w1280${item.backdrop_path}` : 'https://via.placeholder.com/1280x720/1f1f1f/ffffff?text=Omega+Stream';
                 const banner = document.createElement('div');
                 banner.className = 'hero-banner';
                 banner.innerHTML = `
@@ -226,7 +247,7 @@
             currentId = id;
             serverNum = 1;
 
-            let item = currentMovieList.find(m => m.id === id);
+            let item = currentMovieList.find(m => m.id === id) || fallbackMovies.find(m => m.id === id);
             let title = item ? (item.title || item.name) : "Movie Stream";
 
             document.getElementById('homeView').style.display = 'none';
@@ -294,7 +315,7 @@
                 try {
                     let res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(q)}`);
                     let data = await res.json();
-                    let matches = data.results || [];
+                    let matches = (data.results && data.results.length > 0) ? data.results : [];
                     currentMovieList = [...currentMovieList, ...matches];
                     dropdown.innerHTML = '';
                     if(matches.length > 0) {
@@ -392,5 +413,4 @@
         }
     </script>
 </body>
-    </html>
-    
+</html>
