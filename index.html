@@ -72,7 +72,7 @@
         <div class="logo" onclick="goHome()">OMEGA STREAM</div>
         <div class="search-container">
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Search movies, series..." oninput="handleSearchInput()" autocomplete="off">
+                <input type="text" id="searchInput" placeholder="Search movies..." oninput="handleSearchInput()" autocomplete="off">
             </div>
             <div id="searchDropdown" class="search-dropdown"></div>
         </div>
@@ -80,20 +80,20 @@
 
     <div id="homeView">
         <div class="categories">
-            <div class="cat-chip active" onclick="fetchCategoryMovies('trending', this)">Trending</div>
-            <div class="cat-chip" onclick="fetchCategoryMovies('bollywood', this)">Bollywood</div>
-            <div class="cat-chip" onclick="fetchCategoryMovies('south', this)">South Indian</div>
-            <div class="cat-chip" onclick="fetchCategoryMovies('hollywood', this)">Hollywood</div>
+            <div class="cat-chip active" onclick="loadCategory('trending', this)">Trending</div>
+            <div class="cat-chip" onclick="loadCategory('bollywood', this)">Bollywood</div>
+            <div class="cat-chip" onclick="loadCategory('south', this)">South Indian</div>
+            <div class="cat-chip" onclick="loadCategory('hollywood', this)">Hollywood</div>
         </div>
 
         <div class="hero-slider" id="heroSlider"></div>
 
         <div class="section-title">Studios & Genres</div>
         <div class="studios-row">
-            <div class="studio-btn" onclick="fetchStudioMovies('Marvel')">Marvel</div>
-            <div class="studio-btn" onclick="fetchStudioMovies('Sci-Fi')">Sci-Fi</div>
-            <div class="studio-btn" onclick="fetchStudioMovies('Action')">Action</div>
-            <div class="studio-btn" onclick="fetchStudioMovies('Thriller')">Thriller</div>
+            <div class="studio-btn" onclick="loadStudio('Marvel')">Marvel</div>
+            <div class="studio-btn" onclick="loadStudio('Sci-Fi')">Sci-Fi</div>
+            <div class="studio-btn" onclick="loadStudio('Action')">Action</div>
+            <div class="studio-btn" onclick="loadStudio('Thriller')">Thriller</div>
         </div>
 
         <div class="section-title" id="gridTitle">Trending Masterpieces</div>
@@ -124,10 +124,10 @@
     <div id="settingsSection">
         <div class="section-title" style="margin-left:0; margin-bottom:10px;">App Settings</div>
         <div style="background:#1f1f1f; padding:14px; border-radius:6px; font-size:12px; margin-bottom:10px;">
-            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v3.9</p>
-            <p style="color:#aaa;">Connected to Live TMDB & Multi-Cloud Streaming Engines.</p>
+            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v4.0</p>
+            <p style="color:#aaa;">Connected to Live TMDB Streaming Engines.</p>
         </div>
-        <button class="server-btn" onclick="localStorage.clear(); alert('Cache cleared successfully!'); renderHistory();">Clear Watch History</button>
+        <button class="server-btn" onclick="localStorage.clear(); alert('Cache cleared!'); renderHistory();">Clear Watch History</button>
     </div>
 
     <div class="bottom-nav">
@@ -135,20 +135,20 @@
         <div class="nav-item" onclick="switchTab('history', this)"><span>📜 History</span></div>
         <div class="nav-item" onclick="switchTab('midnight', this)"><span>🔥 Midnight</span></div>
         <div class="nav-item" onclick="switchTab('settings', this)"><span>⚙️ Settings</span></div>
-    </div>
-        <script>
+        </div>
+            <script>
         const API_KEY = "c81928373b67961b782987a052865916";
         let currentId = null;
         let serverNum = 1;
         let currentMovieList = [];
 
-        fetchCategoryMovies('trending');
+        loadCategory('trending');
 
-        async function fetchCategoryMovies(cat) {
+        async function loadCategory(type) {
             let url = `https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`;
-            if(cat === 'bollywood') url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_original_language=hi&sort_by=popularity.desc`;
-            if(cat === 'south') url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_original_language=te|ta|ml|kn&sort_by=popularity.desc`;
-            if(cat === 'hollywood') url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_original_language=en&sort_by=popularity.desc`;
+            if(type === 'bollywood') url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_original_language=hi&sort_by=popularity.desc`;
+            if(type === 'south') url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_original_language=te|ta|ml|kn&sort_by=popularity.desc`;
+            if(type === 'hollywood') url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_original_language=en&sort_by=popularity.desc`;
 
             try {
                 let res = await fetch(url);
@@ -158,28 +158,28 @@
                 let sliderItems = currentMovieList.filter(m => !(m.title && m.title.toLowerCase().includes('endgame'))).slice(0, 3);
                 renderSlider(sliderItems);
                 renderGrid(currentMovieList, 'moviesGrid');
-            } catch(e) { console.error(e); }
+            } catch(e) { console.error("Error loading category:", e); }
         }
 
-        async function fetchStudioMovies(studio) {
+        async function loadStudio(studioName) {
             document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
-            document.getElementById('gridTitle').innerText = `${studio} Collection`;
+            document.getElementById('gridTitle').innerText = `${studioName} Collection`;
             try {
-                let res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(studio)}`);
+                let res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(studioName)}`);
                 let data = await res.json();
                 currentMovieList = data.results || [];
                 renderGrid(currentMovieList, 'moviesGrid');
-            } catch(e) { console.error(e); }
+            } catch(e) { console.error("Error loading studio:", e); }
         }
 
-        async function fetchMidnightContent() {
+        async function loadMidnight() {
             document.getElementById('gridTitle').innerText = "🔥 Midnight Horror & Adult Zone (18+)";
             try {
                 let res = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=27&sort_by=popularity.desc`);
                 let data = await res.json();
                 currentMovieList = data.results || [];
                 renderGrid(currentMovieList, 'moviesGrid');
-            } catch(e) { console.error(e); }
+            } catch(e) { console.error("Error loading midnight:", e); }
         }
 
         function renderSlider(items) {
@@ -195,7 +195,7 @@
                     <img class="hero-img" src="${backdrop}" alt="${title}">
                     <div class="hero-overlay">
                         <div class="hero-title">${title}</div>
-                        <div class="play-btn" onclick="openWatchById(${item.id})">▶ Play Now</div>
+                        <div class="play-btn" onclick="openPlayer(${item.id})">▶ Play Now</div>
                     </div>
                 `;
                 slider.appendChild(banner);
@@ -211,7 +211,7 @@
                 let poster = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : 'https://via.placeholder.com/300x450/1f1f1f/ffffff?text=Omega+Stream';
                 const card = document.createElement('div');
                 card.className = 'movie-card';
-                card.onclick = () => openWatchById(item.id);
+                card.onclick = () => openPlayer(item.id);
                 card.innerHTML = `
                     <img src="${poster}" alt="${title}" onerror="this.src='https://via.placeholder.com/300x450/1f1f1f/ffffff?text=Omega+Stream'">
                     <div class="movie-info">
@@ -222,7 +222,7 @@
             });
         }
 
-        async function openWatchById(id) {
+        function openPlayer(id) {
             currentId = id;
             serverNum = 1;
 
@@ -238,7 +238,7 @@
             document.getElementById('watchTitle').innerText = title;
             document.getElementById('watchMeta').innerText = `HD Stream • Multi-Server Switchable`;
 
-            loadPlayer();
+            setServerPlayer();
             window.scrollTo({ top: 0, behavior: 'smooth' });
             saveHistory(id, title);
 
@@ -246,7 +246,7 @@
             renderGrid(recs.slice(0, 4), 'recommendedGrid');
         }
 
-        function loadPlayer() {
+        function setServerPlayer() {
             const iframe = document.getElementById('videoPlayer');
             const directBtn = document.getElementById('directWatchBtn');
             const serverIndicator = document.getElementById('serverIndicator');
@@ -272,7 +272,7 @@
 
         function switchServer() {
             serverNum = (serverNum % 3) + 1;
-            loadPlayer();
+            setServerPlayer();
         }
 
         function goHome() {
@@ -307,7 +307,7 @@
                             div.onclick = () => {
                                 inputEl.value = '';
                                 dropdown.style.display = 'none';
-                                openWatchById(item.id);
+                                openPlayer(item.id);
                             };
                             dropdown.appendChild(div);
                         });
@@ -338,7 +338,7 @@
                 const div = document.createElement('div');
                 div.className = 'history-item';
                 div.innerHTML = `
-                    <div onclick="openWatchById(${item.id})" style="cursor:pointer; flex:1;">
+                    <div onclick="openPlayer(${item.id})" style="cursor:pointer; flex:1;">
                         <div style="font-size:11px; font-weight:bold;">${item.title}</div>
                         <div style="font-size:9px; color:#808080;">MOVIE • ${item.date}</div>
                     </div>
@@ -377,7 +377,7 @@
                     document.getElementById('historySection').style.display = 'none';
                     document.getElementById('searchDropdown').style.display = 'none';
                     document.getElementById('settingsSection').style.display = 'none';
-                    fetchMidnightContent();
+                    loadMidnight();
                 } else {
                     alert("❌ Incorrect Password!");
                     goHome();
@@ -392,4 +392,5 @@
         }
     </script>
 </body>
-</html>
+    </html>
+    
