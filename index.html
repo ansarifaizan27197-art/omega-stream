@@ -123,7 +123,7 @@
     <div id="settingsSection">
         <div class="section-title" style="margin-left:0; margin-bottom:10px;">App Settings</div>
         <div style="background:#1f1f1f; padding:14px; border-radius:6px; font-size:12px; margin-bottom:10px;">
-            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v4.3 (Fixed Search & Play)</p>
+            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v4.4 (Fully Fixed)</p>
             <p style="color:#aaa;">Connected with Multi-Server Cloud Engines.</p>
         </div>
         <button class="server-btn" onclick="localStorage.clear(); alert('Cache cleared!'); renderHistory();">Clear Watch History</button>
@@ -134,13 +134,13 @@
         <div class="nav-item" onclick="switchTab('history', this)"><span>📜 History</span></div>
         <div class="nav-item" onclick="switchTab('midnight', this)"><span>🔥 Midnight</span></div>
         <div class="nav-item" onclick="switchTab('settings', this)"><span>⚙️ Settings</span></div>
-    </div>
-        <script>
+                                                                             </div>
+                <script>
         const API_KEY = "c81928373b67961b782987a052865916";
         let currentId = null;
         let serverNum = 1;
         let currentMovieList = [];
-        let allLoadedMovies = new Map(); // Saari movies ko ID se track karne ke liye
+        let allLoadedMovies = new Map();
 
         const backupMovies = [
             { id: 299534, title: "Avengers: Endgame", poster_path: "/or06FN3Dka5tukK1e9sl16pB3iy.jpg", backdrop_path: "/7RyHsO4yDXtBv1zUU3mTpHeQ0dZ.jpg" },
@@ -151,16 +151,21 @@
             { id: 383498, title: "Deadpool & Wolverine", poster_path: "/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg", backdrop_path: "/y2Ca1neKKE2mGPMaHzLCNDWFqs4.jpg" }
         ];
 
-        // Backup movies ko map mein daal dein
         backupMovies.forEach(m => allLoadedMovies.set(m.id, m));
 
         loadCategory('trending');
 
-        async function loadCategory(type) {
-            document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
-            if(type === 'trending') document.querySelectorAll('.cat-chip')[0].classList.add('active');
-            if(type === 'bollywood') document.querySelectorAll('.cat-chip')[1].classList.add('active');
-            if(type === 'hollywood') document.querySelectorAll('.cat-chip')[2].classList.add('active');
+        async function loadCategory(type, el) {
+            if(el) {
+                document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+                el.classList.add('active');
+            }
+            
+            // Home view ko wapas visible kar do agar hide hua ho
+            document.getElementById('homeView').style.display = 'block';
+            document.getElementById('watchView').style.display = 'none';
+            document.getElementById('historySection').style.display = 'none';
+            document.getElementById('settingsSection').style.display = 'none';
 
             let url = `https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`;
             if(type === 'bollywood') url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_original_language=hi&sort_by=popularity.desc`;
@@ -174,17 +179,25 @@
                 currentMovieList = backupMovies;
             }
 
-            // Map mein store karein
             currentMovieList.forEach(m => allLoadedMovies.set(m.id, m));
 
             let sliderItems = currentMovieList.filter(m => !(m.title && m.title.toLowerCase().includes('endgame'))).slice(0, 3);
             if(sliderItems.length === 0) sliderItems = currentMovieList.slice(0, 3);
+            
+            document.getElementById('heroSlider').style.display = 'flex';
             renderSlider(sliderItems);
+            document.getElementById('gridTitle').innerText = "Trending Masterpieces";
             renderGrid(currentMovieList, 'moviesGrid');
         }
 
         async function loadStudio(studioName) {
             document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+            document.getElementById('homeView').style.display = 'block';
+            document.getElementById('watchView').style.display = 'none';
+            document.getElementById('historySection').style.display = 'none';
+            document.getElementById('settingsSection').style.display = 'none';
+            document.getElementById('heroSlider').style.display = 'none'; // Studio mein slider chupane ke liye
+            
             document.getElementById('gridTitle').innerText = `${studioName} Collection`;
             try {
                 let res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(studioName)}`);
@@ -199,6 +212,13 @@
         }
 
         async function loadMidnight() {
+            document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+            document.getElementById('homeView').style.display = 'block';
+            document.getElementById('watchView').style.display = 'none';
+            document.getElementById('historySection').style.display = 'none';
+            document.getElementById('settingsSection').style.display = 'none';
+            document.getElementById('heroSlider').style.display = 'none';
+
             document.getElementById('gridTitle').innerText = "🔥 Midnight Horror & Adult Zone (18+)";
             try {
                 let res = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=27&sort_by=popularity.desc`);
@@ -256,7 +276,6 @@
             currentId = id;
             serverNum = 1;
 
-            // Global map se movie details nikalein
             let item = allLoadedMovies.get(id) || currentMovieList.find(m => m.id === id) || backupMovies.find(m => m.id === id);
             let title = item ? (item.title || item.name) : "Movie Stream";
 
@@ -313,6 +332,8 @@
             document.getElementById('settingsSection').style.display = 'none';
             document.getElementById('searchDropdown').style.display = 'none';
             document.getElementById('homeView').style.display = 'block';
+            document.getElementById('heroSlider').style.display = 'flex';
+            loadCategory('trending');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -328,7 +349,6 @@
                     let data = await res.json();
                     let matches = (data.results && data.results.length > 0) ? data.results : [];
                     
-                    // Sabhi search matches ko map mein save kar lo taaki click hone par data turant mil jaye
                     matches.forEach(m => allLoadedMovies.set(m.id, m));
 
                     dropdown.innerHTML = '';
@@ -407,7 +427,8 @@
             } else if(tab === 'midnight') {
                 let pass = prompt("🔥 Enter Midnight Mode Password (18+):");
                 if(pass === "omega18") {
-                    document.getElementById('homeView').style.display = 'none';
+                    document.querySelectorAll('.bottom-nav .nav-item').forEach(n => n.classList.remove('active'));
+                    if(el) el.classList.add('active');
                     document.getElementById('watchView').style.display = 'none';
                     document.getElementById('historySection').style.display = 'none';
                     document.getElementById('searchDropdown').style.display = 'none';
@@ -415,7 +436,6 @@
                     loadMidnight();
                 } else {
                     alert("❌ Incorrect Password!");
-                    goHome();
                 }
             } else if(tab === 'settings') {
                 document.getElementById('homeView').style.display = 'none';
@@ -427,5 +447,4 @@
         }
     </script>
 </body>
-    </html>
-    
+</html>
