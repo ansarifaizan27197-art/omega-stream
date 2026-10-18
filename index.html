@@ -8,14 +8,16 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background-color: #141414; color: #fff; font-family: Arial, sans-serif; padding-bottom: 70px; }
 
-        .navbar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #181818; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #282828; }
+        .navbar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #181818; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #282828; }
         .logo { font-size: 16px; font-weight: bold; color: #e50914; cursor: pointer; letter-spacing: 1px; }
         
         .search-container { position: relative; }
-        .search-box input { width: 160px; background: #262626; border: 1px solid #404040; padding: 6px 10px; border-radius: 4px; color: #fff; font-size: 11px; outline: none; }
-        .search-dropdown { position: absolute; top: 32px; right: 0; width: 240px; background: #1f1f1f; border: 1px solid #333; border-radius: 4px; z-index: 200; max-height: 220px; overflow-y: auto; display: none; }
-        .search-suggestion-item { padding: 9px 12px; font-size: 11px; border-bottom: 1px solid #2a2a2a; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
-        .search-suggestion-item:hover { background: #2a2a2a; }
+        .search-box input { width: 180px; background: #262626; border: 1px solid #404040; padding: 8px 12px; border-radius: 4px; color: #fff; font-size: 12px; outline: none; }
+        
+        /* Dropdown fix taaki search result hamesha clearly dikhe */
+        .search-dropdown { position: absolute; top: 40px; right: 0; width: 260px; background: #1f1f1f; border: 1px solid #444; border-radius: 6px; z-index: 9999; max-height: 250px; overflow-y: auto; display: none; box-shadow: 0 8px 24px rgba(0,0,0,0.9); }
+        .search-suggestion-item { padding: 10px 14px; font-size: 12px; border-bottom: 1px solid #2a2a2a; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
+        .search-suggestion-item:hover { background: #333; }
 
         .categories { display: flex; gap: 8px; overflow-x: auto; padding: 10px 16px; background: #141414; scrollbar-width: none; }
         .categories::-webkit-scrollbar { display: none; }
@@ -123,7 +125,7 @@
     <div id="settingsSection">
         <div class="section-title" style="margin-left:0; margin-bottom:10px;">App Settings</div>
         <div style="background:#1f1f1f; padding:14px; border-radius:6px; font-size:12px; margin-bottom:10px;">
-            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v4.7</p>
+            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v4.8</p>
             <p style="color:#aaa;">Connected with Multi-Server Cloud Engines.</p>
         </div>
         <button class="server-btn" onclick="localStorage.clear(); alert('Cache cleared!'); renderHistory();">Clear Watch History</button>
@@ -134,8 +136,8 @@
         <div class="nav-item" onclick="switchTab('history', this)"><span>📜 History</span></div>
         <div class="nav-item" onclick="switchTab('midnight', this)"><span>🔥 Midnight</span></div>
         <div class="nav-item" onclick="switchTab('settings', this)"><span>⚙️ Settings</span></div>
-            </div>
-                <script>
+    </div>
+        <script>
         const API_KEY = "c81928373b67961b782987a052865916";
         let currentId = null;
         let serverNum = 1;
@@ -165,6 +167,7 @@
             document.getElementById('watchView').style.display = 'none';
             document.getElementById('historySection').style.display = 'none';
             document.getElementById('settingsSection').style.display = 'none';
+            document.getElementById('searchDropdown').style.display = 'none';
 
             let url = `https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`;
             if(type === 'bollywood') url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_original_language=hi&sort_by=popularity.desc`;
@@ -196,6 +199,7 @@
             document.getElementById('historySection').style.display = 'none';
             document.getElementById('settingsSection').style.display = 'none';
             document.getElementById('heroSlider').style.display = 'none';
+            document.getElementById('searchDropdown').style.display = 'none';
             
             document.getElementById('gridTitle').innerText = `${studioName} Collection`;
             try {
@@ -217,6 +221,7 @@
             document.getElementById('historySection').style.display = 'none';
             document.getElementById('settingsSection').style.display = 'none';
             document.getElementById('heroSlider').style.display = 'none';
+            document.getElementById('searchDropdown').style.display = 'none';
 
             document.getElementById('gridTitle').innerText = "🔥 Midnight Horror & Adult Zone (18+)";
             try {
@@ -446,5 +451,4 @@
         }
     </script>
 </body>
-            </html>
-            
+</html>
