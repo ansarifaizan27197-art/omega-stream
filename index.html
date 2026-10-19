@@ -14,14 +14,13 @@
         .search-container { position: relative; }
         .search-box input { width: 180px; background: #262626; border: 1px solid #404040; padding: 8px 12px; border-radius: 4px; color: #fff; font-size: 12px; outline: none; }
         
-        /* Dropdown fix taaki search result hamesha clearly dikhe */
         .search-dropdown { position: absolute; top: 40px; right: 0; width: 260px; background: #1f1f1f; border: 1px solid #444; border-radius: 6px; z-index: 9999; max-height: 250px; overflow-y: auto; display: none; box-shadow: 0 8px 24px rgba(0,0,0,0.9); }
         .search-suggestion-item { padding: 10px 14px; font-size: 12px; border-bottom: 1px solid #2a2a2a; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
         .search-suggestion-item:hover { background: #333; }
 
         .categories { display: flex; gap: 8px; overflow-x: auto; padding: 10px 16px; background: #141414; scrollbar-width: none; }
         .categories::-webkit-scrollbar { display: none; }
-        .cat-chip { background: #262626; color: #b3b3b3; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; white-space: nowrap; cursor: pointer; }
+        .cat-chip { background: #262626; color: #b3b3b3; padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: bold; white-space: nowrap; cursor: pointer; flex-shrink: 0; }
         .cat-chip.active { background: #fff; color: #000; }
 
         #homeView { display: block; }
@@ -85,6 +84,14 @@
             <div class="cat-chip active" onclick="loadCategory('trending', this)">Trending</div>
             <div class="cat-chip" onclick="loadCategory('bollywood', this)">Bollywood</div>
             <div class="cat-chip" onclick="loadCategory('hollywood', this)">Hollywood</div>
+            <div class="cat-chip" onclick="loadCategory('south', this)">South Indian</div>
+            <div class="cat-chip" onclick="loadCategory('netflix', this)">Netflix</div>
+            <div class="cat-chip" onclick="loadCategory('appletv', this)">Apple TV+</div>
+            <div class="cat-chip" onclick="loadCategory('hbomax', this)">HBO Max</div>
+            <div class="cat-chip" onclick="loadCategory('animation', this)">Animation</div>
+            <div class="cat-chip" onclick="loadCategory('anime', this)">Anime</div>
+            <div class="cat-chip" onclick="loadCategory('peacock', this)">Peacock</div>
+            <div class="cat-chip" onclick="loadCategory('paramount', this)">Paramount+</div>
         </div>
 
         <div class="hero-slider" id="heroSlider"></div>
@@ -125,8 +132,8 @@
     <div id="settingsSection">
         <div class="section-title" style="margin-left:0; margin-bottom:10px;">App Settings</div>
         <div style="background:#1f1f1f; padding:14px; border-radius:6px; font-size:12px; margin-bottom:10px;">
-            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v4.8</p>
-            <p style="color:#aaa;">Connected with Multi-Server Cloud Engines.</p>
+            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v5.0</p>
+            <p style="color:#aaa;">Connected with Multi-Platform Proxy Engines.</p>
         </div>
         <button class="server-btn" onclick="localStorage.clear(); alert('Cache cleared!'); renderHistory();">Clear Watch History</button>
     </div>
@@ -136,8 +143,8 @@
         <div class="nav-item" onclick="switchTab('history', this)"><span>📜 History</span></div>
         <div class="nav-item" onclick="switchTab('midnight', this)"><span>🔥 Midnight</span></div>
         <div class="nav-item" onclick="switchTab('settings', this)"><span>⚙️ Settings</span></div>
-    </div>
-        <script>
+                </div>
+                    <script>
         const API_KEY = "c81928373b67961b782987a052865916";
         let currentId = null;
         let serverNum = 1;
@@ -157,6 +164,18 @@
 
         loadCategory('trending');
 
+        async function fetchTMDB(rawUrl) {
+            try {
+                let proxyUrl = `https://corsproxy.io/?` + encodeURIComponent(rawUrl);
+                let res = await fetch(proxyUrl);
+                let data = await res.json();
+                return data;
+            } catch(e) {
+                console.error("Fetch error:", e);
+                return null;
+            }
+        }
+
         async function loadCategory(type, el) {
             if(el) {
                 document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
@@ -169,15 +188,45 @@
             document.getElementById('settingsSection').style.display = 'none';
             document.getElementById('searchDropdown').style.display = 'none';
 
-            let url = `https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`;
-            if(type === 'bollywood') url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_original_language=hi&sort_by=popularity.desc`;
-            if(type === 'hollywood') url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_original_language=en&sort_by=popularity.desc`;
+            let targetUrl = `https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`;
+            let titleText = "Trending Masterpieces";
 
-            try {
-                let res = await fetch(url);
-                let data = await res.json();
-                currentMovieList = (data.results && data.results.length > 0) ? data.results : backupMovies;
-            } catch(e) {
+            if(type === 'bollywood') {
+                targetUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_original_language=hi&sort_by=popularity.desc`;
+                titleText = "Bollywood Collection";
+            } else if(type === 'hollywood') {
+                targetUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_original_language=en&sort_by=popularity.desc`;
+                titleText = "Hollywood Collection";
+            } else if(type === 'south') {
+                targetUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_original_language=te|ta|ml|kn&sort_by=popularity.desc`;
+                titleText = "South Indian Collection";
+            } else if(type === 'netflix') {
+                targetUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_watch_providers=8&watch_region=IN&sort_by=popularity.desc`;
+                titleText = "Netflix Collection";
+            } else if(type === 'appletv') {
+                targetUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_watch_providers=350&watch_region=IN&sort_by=popularity.desc`;
+                titleText = "Apple TV+ Collection";
+            } else if(type === 'hbomax') {
+                targetUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_watch_providers=1899&watch_region=IN&sort_by=popularity.desc`;
+                titleText = "HBO Max Collection";
+            } else if(type === 'animation') {
+                targetUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=16&sort_by=popularity.desc`;
+                titleText = "Animation Collection";
+            } else if(type === 'anime') {
+                targetUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_original_language=ja&with_genres=16&sort_by=popularity.desc`;
+                titleText = "Anime Collection";
+            } else if(type === 'peacock') {
+                targetUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_watch_providers=386&watch_region=IN&sort_by=popularity.desc`;
+                titleText = "Peacock Collection";
+            } else if(type === 'paramount') {
+                targetUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_watch_providers=531&watch_region=IN&sort_by=popularity.desc`;
+                titleText = "Paramount+ Collection";
+            }
+
+            let data = await fetchTMDB(targetUrl);
+            if(data && data.results && data.results.length > 0) {
+                currentMovieList = data.results;
+            } else {
                 currentMovieList = backupMovies;
             }
 
@@ -188,7 +237,7 @@
             
             document.getElementById('heroSlider').style.display = 'flex';
             renderSlider(sliderItems);
-            document.getElementById('gridTitle').innerText = type === 'bollywood' ? "Bollywood Collection" : (type === 'hollywood' ? "Hollywood Collection" : "Trending Masterpieces");
+            document.getElementById('gridTitle').innerText = titleText;
             renderGrid(currentMovieList, 'moviesGrid');
         }
 
@@ -202,16 +251,16 @@
             document.getElementById('searchDropdown').style.display = 'none';
             
             document.getElementById('gridTitle').innerText = `${studioName} Collection`;
-            try {
-                let res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(studioName)}`);
-                let data = await res.json();
-                currentMovieList = (data.results && data.results.length > 0) ? data.results : backupMovies;
-                currentMovieList.forEach(m => allLoadedMovies.set(m.id, m));
-                renderGrid(currentMovieList, 'moviesGrid');
-            } catch(e) {
+            let targetUrl = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(studioName)}`;
+            let data = await fetchTMDB(targetUrl);
+            
+            if(data && data.results && data.results.length > 0) {
+                currentMovieList = data.results;
+            } else {
                 currentMovieList = backupMovies;
-                renderGrid(currentMovieList, 'moviesGrid');
             }
+            currentMovieList.forEach(m => allLoadedMovies.set(m.id, m));
+            renderGrid(currentMovieList, 'moviesGrid');
         }
 
         async function loadMidnight() {
@@ -224,16 +273,16 @@
             document.getElementById('searchDropdown').style.display = 'none';
 
             document.getElementById('gridTitle').innerText = "🔥 Midnight Horror & Adult Zone (18+)";
-            try {
-                let res = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=27&sort_by=popularity.desc`);
-                let data = await res.json();
-                currentMovieList = (data.results && data.results.length > 0) ? data.results : backupMovies;
-                currentMovieList.forEach(m => allLoadedMovies.set(m.id, m));
-                renderGrid(currentMovieList, 'moviesGrid');
-            } catch(e) {
+            let targetUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=27&sort_by=popularity.desc`;
+            let data = await fetchTMDB(targetUrl);
+
+            if(data && data.results && data.results.length > 0) {
+                currentMovieList = data.results;
+            } else {
                 currentMovieList = backupMovies;
-                renderGrid(currentMovieList, 'moviesGrid');
             }
+            currentMovieList.forEach(m => allLoadedMovies.set(m.id, m));
+            renderGrid(currentMovieList, 'moviesGrid');
         }
 
         function renderSlider(items) {
@@ -348,32 +397,30 @@
             
             const q = inputEl.value.trim();
             if(q.length > 0) {
-                try {
-                    let res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(q)}`);
-                    let data = await res.json();
-                    let matches = (data.results && data.results.length > 0) ? data.results : [];
-                    
-                    matches.forEach(m => allLoadedMovies.set(m.id, m));
+                let targetUrl = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(q)}`;
+                let data = await fetchTMDB(targetUrl);
+                let matches = (data && data.results && data.results.length > 0) ? data.results : [];
+                
+                matches.forEach(m => allLoadedMovies.set(m.id, m));
 
-                    dropdown.innerHTML = '';
-                    if(matches.length > 0) {
-                        dropdown.style.display = 'block';
-                        matches.slice(0, 6).forEach(item => {
-                            let title = item.title || item.name;
-                            const div = document.createElement('div');
-                            div.className = 'search-suggestion-item';
-                            div.innerText = title;
-                            div.onclick = () => {
-                                inputEl.value = '';
-                                dropdown.style.display = 'none';
-                                openPlayer(item.id);
-                            };
-                            dropdown.appendChild(div);
-                        });
-                    } else {
-                        dropdown.style.display = 'none';
-                    }
-                } catch(e) { dropdown.style.display = 'none'; }
+                dropdown.innerHTML = '';
+                if(matches.length > 0) {
+                    dropdown.style.display = 'block';
+                    matches.slice(0, 6).forEach(item => {
+                        let title = item.title || item.name;
+                        const div = document.createElement('div');
+                        div.className = 'search-suggestion-item';
+                        div.innerText = title;
+                        div.onclick = () => {
+                            inputEl.value = '';
+                            dropdown.style.display = 'none';
+                            openPlayer(item.id);
+                        };
+                        dropdown.appendChild(div);
+                    });
+                } else {
+                    dropdown.style.display = 'none';
+                }
             } else {
                 dropdown.style.display = 'none';
             }
