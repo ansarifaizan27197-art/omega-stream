@@ -135,8 +135,8 @@
     <div id="settingsSection">
         <div class="section-title" style="margin-left:0; margin-bottom:10px;">App Settings</div>
         <div style="background:#1f1f1f; padding:14px; border-radius:6px; font-size:12px; margin-bottom:10px;">
-            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v5.5</p>
-            <p style="color:#aaa;">Multi-Proxy Fallback Engine Enabled.</p>
+            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v5.8</p>
+            <p style="color:#aaa;">Advanced Bypass Proxy Engine Active.</p>
         </div>
         <button class="server-btn" onclick="localStorage.clear(); alert('Cache cleared!'); renderHistory();">Clear Watch History</button>
     </div>
@@ -146,8 +146,8 @@
         <div class="nav-item" onclick="switchTab('history', this)"><span>📜 History</span></div>
         <div class="nav-item" onclick="switchTab('midnight', this)"><span>🔥 Midnight</span></div>
         <div class="nav-item" onclick="switchTab('settings', this)"><span>⚙️ Settings</span></div>
-    </div>
-        <script>
+            </div>
+                <script>
         const API_KEY = "c81928373b67961b782987a052865916";
         let currentId = null;
         let serverNum = 1;
@@ -169,15 +169,16 @@
 
         async function fetchTMDB(rawUrl) {
             let proxies = [
+                `https://api.allorigins.win/raw?url=` + encodeURIComponent(rawUrl),
                 `https://corsproxy.io/?` + encodeURIComponent(rawUrl),
-                `https://api.allorigins.win/raw?url=` + encodeURIComponent(rawUrl)
+                `https://thingproxy.freeboard.io/fetch/` + rawUrl
             ];
 
             for (let proxyUrl of proxies) {
                 try {
                     let res = await fetch(proxyUrl);
                     let data = await res.json();
-                    if (data && (data.results || data.success !== false)) {
+                    if (data && data.results && data.results.length > 0) {
                         return data;
                     }
                 } catch(e) {
@@ -518,5 +519,4 @@
         }
     </script>
 </body>
-    </html>
-    
+</html>
