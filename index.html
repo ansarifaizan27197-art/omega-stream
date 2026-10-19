@@ -135,7 +135,7 @@
     <div id="settingsSection">
         <div class="section-title" style="margin-left:0; margin-bottom:10px;">App Settings</div>
         <div style="background:#1f1f1f; padding:14px; border-radius:6px; font-size:12px; margin-bottom:10px;">
-            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v6.1</p>
+            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v6.3</p>
             <p style="color:#aaa;">Static Database Engine Active.</p>
         </div>
         <button class="server-btn" onclick="localStorage.clear(); alert('Cache cleared!'); renderHistory();">Clear Watch History</button>
@@ -146,8 +146,8 @@
         <div class="nav-item" onclick="switchTab('history', this)"><span>📜 History</span></div>
         <div class="nav-item" onclick="switchTab('midnight', this)"><span>🔥 Midnight</span></div>
         <div class="nav-item" onclick="switchTab('settings', this)"><span>⚙️ Settings</span></div>
-            </div>
-                <script>
+    </div>
+        <script>
         let currentId = null;
         let serverNum = 1;
         let currentMovieList = [];
@@ -238,7 +238,7 @@
         Object.values(dbCategories).forEach(list => {
             list.forEach(m => allLoadedMovies.set(m.id, m));
         });
-                        <script>
+
         loadCategory('trending');
 
         function loadCategory(type, el) {
@@ -478,6 +478,7 @@
         function deleteHistory(id) {
             let hist = JSON.parse(localStorage.getItem('omega_history') || '[]');
             hist = hist.filter(i => i.id !== id);
+                      id);
             localStorage.setItem('omega_history', JSON.stringify(hist));
             renderHistory();
         }
