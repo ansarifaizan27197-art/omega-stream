@@ -135,8 +135,8 @@
     <div id="settingsSection">
         <div class="section-title" style="margin-left:0; margin-bottom:10px;">App Settings</div>
         <div style="background:#1f1f1f; padding:14px; border-radius:6px; font-size:12px; margin-bottom:10px;">
-            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v6.0</p>
-            <p style="color:#aaa;">Static High-Speed Local Database Engine.</p>
+            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v6.1</p>
+            <p style="color:#aaa;">Static Database Engine Active.</p>
         </div>
         <button class="server-btn" onclick="localStorage.clear(); alert('Cache cleared!'); renderHistory();">Clear Watch History</button>
     </div>
@@ -146,14 +146,13 @@
         <div class="nav-item" onclick="switchTab('history', this)"><span>📜 History</span></div>
         <div class="nav-item" onclick="switchTab('midnight', this)"><span>🔥 Midnight</span></div>
         <div class="nav-item" onclick="switchTab('settings', this)"><span>⚙️ Settings</span></div>
-                </div>
-                  <script>
+            </div>
+                <script>
         let currentId = null;
         let serverNum = 1;
         let currentMovieList = [];
         let allLoadedMovies = new Map();
 
-        // Comprehensive Static Database for all categories
         const dbCategories = {
             trending: [
                 { id: 383498, title: "Deadpool & Wolverine", poster_path: "/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg", backdrop_path: "/y2Ca1neKKE2mGPMaHzLCNDWFqs4.jpg" },
@@ -236,11 +235,10 @@
             ]
         };
 
-        // Populate global mapping
         Object.values(dbCategories).forEach(list => {
             list.forEach(m => allLoadedMovies.set(m.id, m));
         });
-
+                        <script>
         loadCategory('trending');
 
         function loadCategory(type, el) {
@@ -293,8 +291,6 @@
             document.getElementById('searchDropdown').style.display = 'none';
             
             document.getElementById('gridTitle').innerText = `${studioName} Collection`;
-            
-            // Filter from all loaded movies or show trending matching name
             let matches = Array.from(allLoadedMovies.values()).filter(m => m.title.toLowerCase().includes(studioName.toLowerCase()));
             currentMovieList = matches.length > 0 ? matches : dbCategories['trending'];
             renderGrid(currentMovieList, 'moviesGrid');
@@ -477,4 +473,50 @@
                 `;
                 list.appendChild(div);
             });
-        
+        }
+
+        function deleteHistory(id) {
+            let hist = JSON.parse(localStorage.getItem('omega_history') || '[]');
+            hist = hist.filter(i => i.id !== id);
+            localStorage.setItem('omega_history', JSON.stringify(hist));
+            renderHistory();
+        }
+
+        function switchTab(tab, el) {
+            if(el) {
+                document.querySelectorAll('.bottom-nav .nav-item').forEach(n => n.classList.remove('active'));
+                el.classList.add('active');
+            }
+            if(tab === 'home') {
+                goHome();
+            } else if(tab === 'history') {
+                document.getElementById('homeView').style.display = 'none';
+                document.getElementById('watchView').style.display = 'none';
+                document.getElementById('settingsSection').style.display = 'none';
+                document.getElementById('searchDropdown').style.display = 'none';
+                document.getElementById('historySection').style.display = 'block';
+                renderHistory();
+            } else if(tab === 'midnight') {
+                let pass = prompt("🔥 Enter Midnight Mode Password (18+):");
+                if(pass === "omega18") {
+                    document.querySelectorAll('.bottom-nav .nav-item').forEach(n => n.classList.remove('active'));
+                    if(el) el.classList.add('active');
+                    document.getElementById('watchView').style.display = 'none';
+                    document.getElementById('historySection').style.display = 'none';
+                    document.getElementById('searchDropdown').style.display = 'none';
+                    document.getElementById('settingsSection').style.display = 'none';
+                    loadMidnight();
+                } else {
+                    alert("❌ Incorrect Password!");
+                }
+            } else if(tab === 'settings') {
+                document.getElementById('homeView').style.display = 'none';
+                document.getElementById('watchView').style.display = 'none';
+                document.getElementById('historySection').style.display = 'none';
+                document.getElementById('searchDropdown').style.display = 'none';
+                document.getElementById('settingsSection').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
