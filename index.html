@@ -86,6 +86,9 @@
             <div class="cat-chip" onclick="loadCategory('hollywood', this)">Hollywood</div>
             <div class="cat-chip" onclick="loadCategory('south', this)">South Indian</div>
             <div class="cat-chip" onclick="loadCategory('netflix', this)">Netflix</div>
+            <div class="cat-chip" onclick="loadCategory('hulu', this)">Hulu</div>
+            <div class="cat-chip" onclick="loadCategory('lionsgate', this)">Lionsgate</div>
+            <div class="cat-chip" onclick="loadCategory('truecrime', this)">True Crime</div>
             <div class="cat-chip" onclick="loadCategory('appletv', this)">Apple TV+</div>
             <div class="cat-chip" onclick="loadCategory('hbomax', this)">HBO Max</div>
             <div class="cat-chip" onclick="loadCategory('animation', this)">Animation</div>
@@ -132,8 +135,8 @@
     <div id="settingsSection">
         <div class="section-title" style="margin-left:0; margin-bottom:10px;">App Settings</div>
         <div style="background:#1f1f1f; padding:14px; border-radius:6px; font-size:12px; margin-bottom:10px;">
-            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v5.0</p>
-            <p style="color:#aaa;">Connected with Multi-Platform Proxy Engines.</p>
+            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v5.5</p>
+            <p style="color:#aaa;">Multi-Proxy Fallback Engine Enabled.</p>
         </div>
         <button class="server-btn" onclick="localStorage.clear(); alert('Cache cleared!'); renderHistory();">Clear Watch History</button>
     </div>
@@ -143,8 +146,8 @@
         <div class="nav-item" onclick="switchTab('history', this)"><span>📜 History</span></div>
         <div class="nav-item" onclick="switchTab('midnight', this)"><span>🔥 Midnight</span></div>
         <div class="nav-item" onclick="switchTab('settings', this)"><span>⚙️ Settings</span></div>
-                </div>
-                    <script>
+    </div>
+        <script>
         const API_KEY = "c81928373b67961b782987a052865916";
         let currentId = null;
         let serverNum = 1;
@@ -165,15 +168,23 @@
         loadCategory('trending');
 
         async function fetchTMDB(rawUrl) {
-            try {
-                let proxyUrl = `https://corsproxy.io/?` + encodeURIComponent(rawUrl);
-                let res = await fetch(proxyUrl);
-                let data = await res.json();
-                return data;
-            } catch(e) {
-                console.error("Fetch error:", e);
-                return null;
+            let proxies = [
+                `https://corsproxy.io/?` + encodeURIComponent(rawUrl),
+                `https://api.allorigins.win/raw?url=` + encodeURIComponent(rawUrl)
+            ];
+
+            for (let proxyUrl of proxies) {
+                try {
+                    let res = await fetch(proxyUrl);
+                    let data = await res.json();
+                    if (data && (data.results || data.success !== false)) {
+                        return data;
+                    }
+                } catch(e) {
+                    continue;
+                }
             }
+            return null;
         }
 
         async function loadCategory(type, el) {
@@ -203,6 +214,15 @@
             } else if(type === 'netflix') {
                 targetUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_watch_providers=8&watch_region=IN&sort_by=popularity.desc`;
                 titleText = "Netflix Collection";
+            } else if(type === 'hulu') {
+                targetUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_watch_providers=15&watch_region=US&sort_by=popularity.desc`;
+                titleText = "Hulu Collection";
+            } else if(type === 'lionsgate') {
+                targetUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_companies=35&sort_by=popularity.desc`;
+                titleText = "Lionsgate Collection";
+            } else if(type === 'truecrime') {
+                targetUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=80,99&sort_by=popularity.desc`;
+                titleText = "True Crime & Investigation";
             } else if(type === 'appletv') {
                 targetUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_watch_providers=350&watch_region=IN&sort_by=popularity.desc`;
                 titleText = "Apple TV+ Collection";
@@ -498,4 +518,5 @@
         }
     </script>
 </body>
-</html>
+    </html>
+    
