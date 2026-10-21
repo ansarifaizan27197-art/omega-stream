@@ -7,13 +7,6 @@
         "category": "marvel"
     },
     {
-        "id": 299534,
-        "title": "Avengers: Endgame",
-        "poster_path": "https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg",
-        "backdrop_path": "https://image.tmdb.org/t/p/w1280/7RyHsO4yDXtBv1zUU3mTpHeQ0d5.jpg",
-        "category": "marvel"
-    },
-    {
         "id": 634649,
         "title": "Spider-Man: No Way Home",
         "poster_path": "https://image.tmdb.org/t/p/w500/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg",
@@ -21,45 +14,31 @@
         "category": "marvel"
     },
     {
-        "id": 157336,
-        "title": "Interstellar",
-        "poster_path": "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
-        "backdrop_path": "https://image.tmdb.org/t/p/w1280/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
-        "category": "hollywood"
+        "id": 569094,
+        "title": "Spider-Man: Across the Spider-Verse",
+        "poster_path": "https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg",
+        "backdrop_path": "https://image.tmdb.org/t/p/w1280/4HodYYKEIsGOdhrGi2U46XGlGy1.jpg",
+        "category": "marvel"
     },
     {
-        "id": 872585,
-        "title": "Oppenheimer",
-        "poster_path": "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
-        "backdrop_path": "https://image.tmdb.org/t/p/w1280/fm6KJNcyPp3y4ovheHyqVnniDph.jpg",
-        "category": "hollywood"
-    },
-    {
-        "id": 1011985,
-        "title": "Kung Fu Panda 4",
-        "poster_path": "https://image.tmdb.org/t/p/w500/kDp1vUBnMpe8akTaDrjl3Z7sIgZ.jpg",
-        "backdrop_path": "https://image.tmdb.org/t/p/w1280/1XDDjoOQG8eVr4g6oR3Dk4sUa0T.jpg",
-        "category": "disney"
-    },
-    {
-        "id": 519182,
-        "title": "Despicable Me 4",
-        "poster_path": "https://image.tmdb.org/t/p/w500/wWba3TaojhK7NdycRhoQpsG0FaH.jpg",
-        "backdrop_path": "https://image.tmdb.org/t/p/w1280/lgkqlauZkJjM5GhSi5kK41f0U2D.jpg",
-        "category": "disney"
-    },
-    {
-        "id": 940721,
-        "title": "Godzilla x Kong: The New Empire",
-        "poster_path": "https://image.tmdb.org/t/p/w500/z121dSTR7PY9KxK1wiIFSYZf46n.jpg",
-        "backdrop_path": "https://image.tmdb.org/t/p/w1280/qekky2LbtT1wtD5MDgPABrUZmIi.jpg",
-        "category": "hollywood"
+        "id": 299534,
+        "title": "Avengers: Endgame",
+        "poster_path": "https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg",
+        "backdrop_path": "https://image.tmdb.org/t/p/w1280/7RyHsO4yDXtBv1zUU3mTpHeQ0d5.jpg",
+        "category": "marvel"
     },
     {
         "id": 843241,
         "title": "Jawan",
         "poster_path": "https://image.tmdb.org/t/p/w500/jmJHi3aYZv5wXCALO5h9eWwz3y2.jpg",
         "backdrop_path": "https://image.tmdb.org/t/p/w1280/5mzr6JZbrqnqD3lCEwAJdASqPjZ.jpg",
+        "category": "bollywood"
+    },
+    {
+        "id": 999911,
+        "title": "Drishyam 3",
+        "poster_path": "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
+        "backdrop_path": "https://image.tmdb.org/t/p/w1280/fm6KJNcyPp3y4ovheHyqVnniDph.jpg",
         "category": "bollywood"
     },
     {
@@ -70,8 +49,8 @@
         "category": "bollywood"
     },
     {
-        "id": 359410,
-        "title": "Baahubali 2: The Conclusion",
+        "id": 999922,
+        "title": "Jailer 2",
         "poster_path": "https://image.tmdb.org/t/p/w500/2CAL2433ZeIihfX1Hb2139CX0dr.jpg",
         "backdrop_path": "https://image.tmdb.org/t/p/w1280/9yBVqNruk6Ykrwc32qrK2TIE5xw.jpg",
         "category": "south"
@@ -82,5 +61,26 @@
         "poster_path": "https://image.tmdb.org/t/p/w500/jdLsBo6ZH7kZcE7q6819Rk91y2d.jpg",
         "backdrop_path": "https://image.tmdb.org/t/p/w1280/yGZ1uC9vL1c4N57G6yE8nL3J8v.jpg",
         "category": "south"
+    },
+    {
+        "id": 359410,
+        "title": "Baahubali 2: The Conclusion",
+        "poster_path": "https://image.tmdb.org/t/p/w500/2CAL2433ZeIihfX1Hb2139CX0dr.jpg",
+        "backdrop_path": "https://image.tmdb.org/t/p/w1280/9yBVqNruk6Ykrwc32qrK2TIE5xw.jpg",
+        "category": "south"
+    },
+    {
+        "id": 1011985,
+        "title": "Kung Fu Panda 4",
+        "poster_path": "https://image.tmdb.org/t/p/w500/kDp1vUBnMpe8akTaDrjl3Z7sIgZ.jpg",
+        "backdrop_path": "https://image.tmdb.org/t/p/w1280/1XDDjoOQG8eVr4g6oR3Dk4sUa0T.jpg",
+        "category": "disney"
+    },
+    {
+        "id": 157336,
+        "title": "Interstellar",
+        "poster_path": "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
+        "backdrop_path": "https://image.tmdb.org/t/p/w1280/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
+        "category": "hollywood"
     }
 ]
