@@ -28,18 +28,39 @@
         "category": "marvel"
     },
     {
-        "id": 359410,
-        "title": "Baahubali 2: The Conclusion",
+        "id": 900111,
+        "title": "HIT The 3rd Case",
         "poster_path": "https://image.tmdb.org/t/p/w500/2CAL2433ZeIihfX1Hb2139CX0dr.jpg",
         "backdrop_path": "https://image.tmdb.org/t/p/w1280/9yBVqNruk6Ykrwc32qrK2TIE5xw.jpg",
         "category": "south"
     },
     {
-        "id": 558449,
-        "title": "K.G.F: Chapter 2",
+        "id": 900222,
+        "title": "The Paradise",
         "poster_path": "https://image.tmdb.org/t/p/w500/jdLsBo6ZH7kZcE7q6819Rk91y2d.jpg",
         "backdrop_path": "https://image.tmdb.org/t/p/w1280/yGZ1uC9vL1c4N57G6yE8nL3J8v.jpg",
         "category": "south"
+    },
+    {
+        "id": 900333,
+        "title": "Street Fighter (2026)",
+        "poster_path": "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
+        "backdrop_path": "https://image.tmdb.org/t/p/w1280/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
+        "category": "hollywood"
+    },
+    {
+        "id": 900444,
+        "title": "Nayi Naveli",
+        "poster_path": "https://image.tmdb.org/t/p/w500/mYLOqiSrsq7jsuEaT2VvL2nZqI4.jpg",
+        "backdrop_path": "https://image.tmdb.org/t/p/w1280/t5zCBSB5xMDKQDqe91qamCOUYVV.jpg",
+        "category": "bollywood"
+    },
+    {
+        "id": 900555,
+        "title": "The End of Oak Street",
+        "poster_path": "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
+        "backdrop_path": "https://image.tmdb.org/t/p/w1280/fm6KJNcyPp3y4ovheHyqVnniDph.jpg",
+        "category": "hollywood"
     },
     {
         "id": 1011985,
@@ -53,13 +74,6 @@
         "title": "Interstellar",
         "poster_path": "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
         "backdrop_path": "https://image.tmdb.org/t/p/w1280/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
-        "category": "hollywood"
-    },
-    {
-        "id": 872585,
-        "title": "Oppenheimer",
-        "poster_path": "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
-        "backdrop_path": "https://image.tmdb.org/t/p/w1280/fm6KJNcyPp3y4ovheHyqVnniDph.jpg",
         "category": "hollywood"
     }
         ]
