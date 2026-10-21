@@ -1,70 +1,86 @@
-import json
-import urllib.request
-
-BEARER_TOKEN = (
-    "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyN2M3ZjJkZTU3YzUyZGRhMjI1YTkxMjg5ZjRiNmFlMiIs"
-    "Im5iZiI6MTc5MTM2MDAyNy4zMzQsInN1YiI6IjZhYzVmYzFiOGM4NWQzMmZhZmYyN2NiYSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.G_VD8Slnl18KXmgxZI5dhBQCOM15QR5TzLgGq-8H9d8"
-)
-
-# Alag-alag endpoints ya trending data fetch karne ke liye
-URL = "https://api.themoviedb.org/3/trending/movie/day"
-
-
-def fetch_movies (  ) :
-  req = urllib.request.Request(
-      URL,
-      headers={
-          "Authorization": f"Bearer {BEARER_TOKEN}",
-          "accept": "application/json",
-      },
-  )
-  with urllib.request.urlopen ( req) as response:
-    if response.status == 200:
-      data = json.loads ( response.read (  ) .decode ( "utf-8" ) )
-      movies_list = []
-      for item in data.get ( "results", [] ) :
-        title = item.get ( "title") or item.get ( "original_title", "Unknown")
-        overview = item.get ( "overview", "" ) .lower ( )
-        original_language = item.get ( "original_language", "")
-
-        # Category automatic detect karne ka logic
-        category = "hollywood"
-        if (
-            "marvel" in title.lower ( )
-            or "avengers" in title.lower ( )
-            or "spider" in title.lower ( )
-            or "deadpool" in title.lower ( )
-        ):
-          category = "marvel"
-        elif "disney" in overview or "animation" in overview:
-          category = "disney"
-        elif original_language == "hi":
-          category = "bollywood"
-        elif original_language in ["ta", "te", "ml", "kn"]:
-          category = "south"
-
-        movie_data = {
-            "id": item.get ( "id" ) ,
-            "title": title,
-            "poster_path": (
-                "https://image.tmdb.org/t/p/w500" + item.get ( "poster_path")
-                if item.get ( "poster_path")
-                else ""
-            ),
-            "backdrop_path": (
-                "https://image.tmdb.org/t/p/w1280"
-                + item.get ( "backdrop_path")
-                if item.get ( "backdrop_path")
-                else ""
-            ),
-            "category": category,
-        }
-        movies_list.append ( movie_data)
-
-      with open ( "movies.json", "w", encoding="utf-8") as f:
-        json.dump ( movies_list, f, ensure_ensure_ascii=False, indent=4)
-      print ( f"Success! {len ( movies_list ) } movies saved with proper categories.")
-
-
-if __name__ == "__main__":
-  fetch_movies ( )
+[
+    {
+        "id": 533535,
+        "title": "Deadpool & Wolverine",
+        "poster_path": "https://image.tmdb.org/t/p/w500/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg",
+        "backdrop_path": "https://image.tmdb.org/t/p/w1280/y2Ca1neKke2mGPMaHzlCDNMFpsK.jpg",
+        "category": "marvel"
+    },
+    {
+        "id": 299534,
+        "title": "Avengers: Endgame",
+        "poster_path": "https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg",
+        "backdrop_path": "https://image.tmdb.org/t/p/w1280/7RyHsO4yDXtBv1zUU3mTpHeQ0d5.jpg",
+        "category": "marvel"
+    },
+    {
+        "id": 634649,
+        "title": "Spider-Man: No Way Home",
+        "poster_path": "https://image.tmdb.org/t/p/w500/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg",
+        "backdrop_path": "https://image.tmdb.org/t/p/w1280/iQFcwSGbZXMkeyKrxbPnwnRo5fl.jpg",
+        "category": "marvel"
+    },
+    {
+        "id": 157336,
+        "title": "Interstellar",
+        "poster_path": "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
+        "backdrop_path": "https://image.tmdb.org/t/p/w1280/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
+        "category": "hollywood"
+    },
+    {
+        "id": 872585,
+        "title": "Oppenheimer",
+        "poster_path": "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
+        "backdrop_path": "https://image.tmdb.org/t/p/w1280/fm6KJNcyPp3y4ovheHyqVnniDph.jpg",
+        "category": "hollywood"
+    },
+    {
+        "id": 1011985,
+        "title": "Kung Fu Panda 4",
+        "poster_path": "https://image.tmdb.org/t/p/w500/kDp1vUBnMpe8akTaDrjl3Z7sIgZ.jpg",
+        "backdrop_path": "https://image.tmdb.org/t/p/w1280/1XDDjoOQG8eVr4g6oR3Dk4sUa0T.jpg",
+        "category": "disney"
+    },
+    {
+        "id": 519182,
+        "title": "Despicable Me 4",
+        "poster_path": "https://image.tmdb.org/t/p/w500/wWba3TaojhK7NdycRhoQpsG0FaH.jpg",
+        "backdrop_path": "https://image.tmdb.org/t/p/w1280/lgkqlauZkJjM5GhSi5kK41f0U2D.jpg",
+        "category": "disney"
+    },
+    {
+        "id": 940721,
+        "title": "Godzilla x Kong: The New Empire",
+        "poster_path": "https://image.tmdb.org/t/p/w500/z121dSTR7PY9KxK1wiIFSYZf46n.jpg",
+        "backdrop_path": "https://image.tmdb.org/t/p/w1280/qekky2LbtT1wtD5MDgPABrUZmIi.jpg",
+        "category": "hollywood"
+    },
+    {
+        "id": 843241,
+        "title": "Jawan",
+        "poster_path": "https://image.tmdb.org/t/p/w500/jmJHi3aYZv5wXCALO5h9eWwz3y2.jpg",
+        "backdrop_path": "https://image.tmdb.org/t/p/w1280/5mzr6JZbrqnqD3lCEwAJdASqPjZ.jpg",
+        "category": "bollywood"
+    },
+    {
+        "id": 848326,
+        "title": "Pathaan",
+        "poster_path": "https://image.tmdb.org/t/p/w500/mYLOqiSrsq7jsuEaT2VvL2nZqI4.jpg",
+        "backdrop_path": "https://image.tmdb.org/t/p/w1280/t5zCBSB5xMDKQDqe91qamCOUYVV.jpg",
+        "category": "bollywood"
+    },
+    {
+        "id": 359410,
+        "title": "Baahubali 2: The Conclusion",
+        "poster_path": "https://image.tmdb.org/t/p/w500/2CAL2433ZeIihfX1Hb2139CX0dr.jpg",
+        "backdrop_path": "https://image.tmdb.org/t/p/w1280/9yBVqNruk6Ykrwc32qrK2TIE5xw.jpg",
+        "category": "south"
+    },
+    {
+        "id": 558449,
+        "title": "K.G.F: Chapter 2",
+        "poster_path": "https://image.tmdb.org/t/p/w500/jdLsBo6ZH7kZcE7q6819Rk91y2d.jpg",
+        "backdrop_path": "https://image.tmdb.org/t/p/w1280/yGZ1uC9vL1c4N57G6yE8nL3J8v.jpg",
+        "category": "south"
+    }
+]
