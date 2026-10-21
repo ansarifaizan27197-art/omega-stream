@@ -18,11 +18,6 @@
         .search-suggestion-item { padding: 10px 14px; font-size: 12px; border-bottom: 1px solid #2a2a2a; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
         .search-suggestion-item:hover { background: #333; }
 
-        .categories { display: flex; gap: 8px; overflow-x: auto; padding: 10px 16px; background: #141414; scrollbar-width: none; }
-        .categories::-webkit-scrollbar { display: none; }
-        .cat-chip { background: #262626; color: #b3b3b3; padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: bold; white-space: nowrap; cursor: pointer; flex-shrink: 0; }
-        .cat-chip.active { background: #fff; color: #000; }
-
         #homeView { display: block; }
         
         .hero-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; gap: 12px; padding: 10px 16px; }
@@ -35,10 +30,6 @@
 
         .section-title { margin: 18px 16px 8px; font-size: 13px; font-weight: bold; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; }
         
-        .studios-row { display: flex; gap: 8px; overflow-x: auto; padding: 0 16px; scrollbar-width: none; }
-        .studios-row::-webkit-scrollbar { display: none; }
-        .studio-btn { min-width: 90px; height: 42px; background: #222; border: 1px solid #333; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; cursor: pointer; color: #fff; flex-shrink: 0; }
-
         .movies-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; padding: 0 16px; margin-top: 8px; }
         .movie-card { background: #1f1f1f; border-radius: 6px; overflow: hidden; cursor: pointer; border: 1px solid #2a2a2a; }
         .movie-card img { width: 100%; height: 195px; object-fit: cover; display: block; }
@@ -77,34 +68,10 @@
             </div>
             <div id="searchDropdown" class="search-dropdown"></div>
         </div>
-                    </div>
-                        <div id="homeView">
-        <div class="categories">
-            <div class="cat-chip active" onclick="loadCategory('trending', this)">Trending</div>
-            <div class="cat-chip" onclick="loadCategory('bollywood', this)">Bollywood</div>
-            <div class="cat-chip" onclick="loadCategory('hollywood', this)">Hollywood</div>
-            <div class="cat-chip" onclick="loadCategory('south', this)">South Indian</div>
-            <div class="cat-chip" onclick="loadCategory('netflix', this)">Netflix</div>
-            <div class="cat-chip" onclick="loadCategory('hulu', this)">Hulu</div>
-            <div class="cat-chip" onclick="loadCategory('lionsgate', this)">Lionsgate</div>
-            <div class="cat-chip" onclick="loadCategory('truecrime', this)">True Crime</div>
-            <div class="cat-chip" onclick="loadCategory('appletv', this)">Apple TV+</div>
-            <div class="cat-chip" onclick="loadCategory('hbomax', this)">HBO Max</div>
-            <div class="cat-chip" onclick="loadCategory('animation', this)">Animation</div>
-            <div class="cat-chip" onclick="loadCategory('anime', this)">Anime</div>
-            <div class="cat-chip" onclick="loadCategory('peacock', this)">Peacock</div>
-            <div class="cat-chip" onclick="loadCategory('paramount', this)">Paramount+</div>
-        </div>
+    </div>
 
+    <div id="homeView">
         <div class="hero-slider" id="heroSlider"></div>
-
-        <div class="section-title">Studios & Genres</div>
-        <div class="studios-row">
-            <div class="studio-btn" onclick="loadStudio('Marvel')">Marvel</div>
-            <div class="studio-btn" onclick="loadStudio('Sci-Fi')">Sci-Fi</div>
-            <div class="studio-btn" onclick="loadStudio('Action')">Action</div>
-            <div class="studio-btn" onclick="loadStudio('Thriller')">Thriller</div>
-        </div>
 
         <div class="section-title" id="gridTitle">Trending Masterpieces</div>
         <div class="movies-grid" id="moviesGrid"></div>
@@ -134,8 +101,8 @@
     <div id="settingsSection">
         <div class="section-title" style="margin-left:0; margin-bottom:10px;">App Settings</div>
         <div style="background:#1f1f1f; padding:14px; border-radius:6px; font-size:12px; margin-bottom:10px;">
-            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v6.3</p>
-            <p style="color:#aaa;">Static Database Engine Active.</p>
+            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v7.0</p>
+            <p style="color:#aaa;">Dynamic JSON Engine Active.</p>
         </div>
         <button class="server-btn" onclick="localStorage.clear(); alert('Cache cleared!'); renderHistory();">Clear Watch History</button>
     </div>
@@ -143,169 +110,34 @@
     <div class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('home', this)"><span>🏠 Home</span></div>
         <div class="nav-item" onclick="switchTab('history', this)"><span>📜 History</span></div>
-        <div class="nav-item" onclick="switchTab('midnight', this)"><span>🔥 Midnight</span></div>
         <div class="nav-item" onclick="switchTab('settings', this)"><span>⚙️ Settings</span></div>
     </div>
-            let currentId = null;
+
+    <script>
+        let currentId = null;
         let serverNum = 1;
         let currentMovieList = [];
         let allLoadedMovies = new Map();
 
-        const dbCategories = {
-            trending: [
-                { id: 383498, title: "Deadpool & Wolverine", poster_path: "/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg", backdrop_path: "/y2Ca1neKKE2mGPMaHzLCNDWFqs4.jpg" },
-                { id: 299534, title: "Avengers: Endgame", poster_path: "/or06FN3Dka5tukK1e9sl16pB3iy.jpg", backdrop_path: "/7RyHsO4yDXtBv1zUU3mTpHeQ0dZ.jpg" },
-                { id: 157336, title: "Interstellar", poster_path: "/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg", backdrop_path: "/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg" },
-                { id: 634649, title: "Spider-Man: No Way Home", poster_path: "/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg", backdrop_path: "/iQFcwSGbZXMkeyKrxbPnwnRo5fl.jpg" },
-                { id: 27205, title: "Inception", poster_path: "/edv5CZvWj09upOsy2Y6IwDhK8bt.jpg", backdrop_path: "/s3TBrRGB1iv7gOCQz0VnICnDqWp.jpg" },
-                { id: 550, title: "Fight Club", poster_path: "/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg", backdrop_path: "/hZkgoQYus5vegHoetLkCJzb17zJ.jpg" }
-            ],
-            bollywood: [
-                { id: 804095, title: "Pathaan", poster_path: "/mYm0vWpUIMuQCKapWv4L1B1Uf4U.jpg", backdrop_path: "/oo7gB4a4C97K3Uu06n8e0rL3J4d.jpg" },
-                { id: 934509, title: "Jawan", poster_path: "/jcwOsgaLkNoYuHNW2xYpWwWw.jpg", backdrop_path: "/qwOQcI9iC9W4Z6f5b9d2e1f4x3.jpg" },
-                { id: 609681, title: "Animal", poster_path: "/coOd8kC78hZ9t01iVwE1L1P2j7.jpg", backdrop_path: "/8V1FwK1A8w0D6X2N5f0G4x6y3.jpg" },
-                { id: 753342, title: "Stree 2", poster_path: "/2c8M4w4e9lP1wz2a4v5g0d3y6b.jpg", backdrop_path: "/3r0Z3b5w6c7d8e9f0g1h2i3j4k5.jpg" },
-                { id: 837881, title: "Dunki", poster_path: "/4P7f9B1d9N3o5f7s2a8c0v4e6.jpg", backdrop_path: "/a1b2c3d4e5f6g7h8i9j0k1l2m3.jpg" }
-            ],
-            hollywood: [
-                { id: 693134, title: "Dune: Part Two", poster_path: "/8b8R8l8L8z0u1t2s3r4q5p6o7n.jpg", backdrop_path: "/xOMo8DxXtwGYiLz2H3X8t2Fv5yU.jpg" },
-                { id: 872585, title: "Oppenheimer", poster_path: "/8Gxv8gSFCU0Lq1Y8x8G3s4Z2X1.jpg", backdrop_path: "/fm6KqXpeK5J5u5s0b5j9z8r1c2.jpg" },
-                { id: 507089, title: "Five Nights at Freddy's", poster_path: "/t5zCBSB5xM2kJl1G1b9w8z7y6x5.jpg", backdrop_path: "/rLb2TEugtPxQGkKq7RjP5s8Z6c3.jpg" },
-                { id: 929590, title: "Civil War", poster_path: "/sh7Rg8Er3tFcN9BpE2lJ9d5t4n3.jpg", backdrop_path: "/z1x2c3v4b5n6m7l8k9j0h1g2f3.jpg" }
-            ],
-            south: [
-                { id: 579974, title: "RRR", poster_path: "/nEuhtMCvKzXMXCLf45dYV3fR9E1.jpg", backdrop_path: "/wV4V3j2w3u5t6y7u8i9o0p1a2s3.jpg" },
-                { id: 739343, title: "KGF Chapter 2", poster_path: "/kh1zU3j2u3o4p5l6k7j8h9g0f1d.jpg", backdrop_path: "/qw1e2r3t4y5u6i7o8p9a0s1d2f3.jpg" },
-                { id: 671039, title: "Pushpa 2: The Rule", poster_path: "/a1b2c3d4e5f6g7h8i9j0k1l2m3.jpg", backdrop_path: "/z9y8x7w6v5u4t3s2r1q0p9o8n7.jpg" },
-                { id: 823432, title: "Kalki 2898 AD", poster_path: "/g1h2i3j4k5l6m7n8o9p0q1r2s3.jpg", backdrop_path: "/a3b2c1d0e9f8g7h6i5j4k3l2m1.jpg" }
-            ],
-            netflix: [
-                { id: 533535, title: "Deadpool & Wolverine", poster_path: "/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg", backdrop_path: "/y2Ca1neKKE2mGPMaHzLCNDWFqs4.jpg" },
-                { id: 973655, title: "Extraction 2", poster_path: "/7gKI9hpJ_CBesQHzJXDtlHh5U6F.jpg", backdrop_path: "/zzXfdcLbpWbCWL7H9nQ5wZ7m3f.jpg" },
-                { id: 843527, title: "The Gray Man", poster_path: "/8XeIS9JIgT0kJGJAM8n7Z7cM2w2.jpg", backdrop_path: "/hpU2C3Kq0T1l2m3n4o5p6q7r8s9.jpg" },
-                { id: 615656, title: "Meg 2: The Trench", poster_path: "/4m1CfG3r8s9t0u1v2w3x4y5z6a7.jpg", backdrop_path: "/b1c2d3e4f5g6h7i8j9k0l1m2n3.jpg" }
-            ],
-            hulu: [
-                { id: 787699, title: "Nomadland", poster_path: "/xXR8qgB3eO5n1a2l3k4j5h6g7f.jpg", backdrop_path: "/a1b2c3d4e5f6g7h8i9j0k1l2m3.jpg" },
-                { id: 603692, title: "John Wick: Chapter 4", poster_path: "/vZloFAK7NmvMGKE7VkF5UHaz0I.jpg", backdrop_path: "/hZkgoQYus5vegHoetLkCJzb17zJ.jpg" },
-                { id: 76600, title: "Avatar: The Way of Water", poster_path: "/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg", backdrop_path: "/z9y8x7w6v5u4t3s2r1q0p9o8n7.jpg" }
-            ],
-            lionsgate: [
-                { id: 324857, title: "Spider-Man: Into the Spider-Verse", poster_path: "/iiZZdoQBEYBv6id8su7ImL0oCbD.jpg", backdrop_path: "/z9y8x7w6v5u4t3s2r1q0p9o8n7.jpg" },
-                { id: 458156, title: "John Wick: Chapter 3", poster_path: "/ziEuTNiPjoETQTVU5UPvW381b0a.jpg", backdrop_path: "/a1b2c3d4e5f6g7h8i9j0k1l2m3.jpg" },
-                { id: 569094, title: "Spider-Man: Across the Spider-Verse", poster_path: "/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg", backdrop_path: "/4HodYYKEICGEzXv3r2K9WzQjMmA.jpg" }
-            ],
-            truecrime: [
-                { id: 475557, title: "Joker", poster_path: "/udDclJoHjfjb8Ekgsd4FDteOkCU.jpg", backdrop_path: "/n6bUvigpRFqSwmPp1m2YADdbRBc.jpg" },
-                { id: 414906, title: "The Batman", poster_path: "/74xTEgt7R36Fpooo50r9T25onhq.jpg", backdrop_path: "/b0PlSFdDwbyK0cf5RxwDpaOJQvQ.jpg" },
-                { id: 268, title: "Batman Begins", poster_path: "/4MpN4swVOEAiIgtYfHcfQ1j2z4w.jpg", backdrop_path: "/lh5zibjhYnrmWWlWCS0S3R1Wv9D.jpg" }
-            ],
-                appletv: [
-                { id: 846177, title: "Killers of the Flower Moon", poster_path: "/dB6Krk806zeqd0YNp2ngQ9zXte.jpg", backdrop_path: "/azZZmNLwUK0YpXzT5H1mP2gW1Q.jpg" },
-                { id: 753342, title: "Napoleon", poster_path: "/jZIYaISP3GBSrJDXsrV45g4Yn90.jpg", backdrop_path: "/rLb2TEugtPxQGkKq7RjP5s8Z6c3.jpg" }
-            ],
-            hbomax: [
-                { id: 792307, title: "Poor Things", poster_path: "/kCGlIMHnOm8JPXq3rXM6c5wMxcT.jpg", backdrop_path: "/bckxSNwYV1P0L1dD1l5Sj3f1P2.jpg" },
-                { id: 603, title: "The Matrix", poster_path: "/f89U3ADr1OIJ1s94lPOEpVFKwR0.jpg", backdrop_path: "/ncEsesgIJOT2SgXbZ00j4bL9q5.jpg" }
-            ],
-            animation: [
-                { id: 519182, title: "Despicable Me 4", poster_path: "/wWba3SudS2WlQqX7eZ13Y5d2s2K.jpg", backdrop_path: "/lgkPzcOSnTvjeMnuFzhzRO5HH6m.jpg" },
-                { id: 1022789, title: "Inside Out 2", poster_path: "/vpnVM9B6NMmQpWeZvzLvDESb2QY.jpg", backdrop_path: "/stKGOm8UyhuLPL9sZLjoZ3g3a7M.jpg" },
-                { id: 502356, title: "The Super Mario Bros. Movie", poster_path: "/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg", backdrop_path: "/9n2tJBplPbgR2ca05hS5CKXwP2c.jpg" }
-            ],
-            anime: [
-                { id: 129, title: "Spirited Away", poster_path: "/39wmItIWsg5sZMyRUUTkWBcuBPn.jpg", backdrop_path: "/f9zK8qN4yJ2w2d1m2n3v4c5x6z7.jpg" },
-                { id: 372585, title: "Your Name", poster_path: "/q719jzvTPMdWvJAIkgyioI3KAcU.jpg", backdrop_path: "/xOMo8DxXtwGYiLz2H3X8t2Fv5yU.jpg" },
-                { id: 568124, title: "Demon Slayer: Mugen Train", poster_path: "/h8Rb9gBr48ODIoEIUdZ78y6fcEC.jpg", backdrop_path: "/z9y8x7w6v5u4t3s2r1q0p9o8n7.jpg" }
-            ],
-            peacock: [
-                { id: 76341, title: "Mad Max: Fury Road", poster_path: "/hA2ple9q4qnWxMP3hINL4QfWO0g.jpg", backdrop_path: "/nlCHuwjY9XWbuEUQauCBgnY8AMF.jpg" },
-                { id: 335983, title: "Venom", poster_path: "/2uNW4WbgBXL25BAbXGLnLqX71Sw.jpg", backdrop_path: "/suaEOtk1N1sgg2MTM7oZd2cfVp3.jpg" }
-            ],
-            paramount: [
-                { id: 438631, title: "Dune", poster_path: "/d5NXSklXo0qyIYkgV94XAgMIckC.jpg", backdrop_path: "/jYEW5xZkZk2WTRdbMGAPFLGRUdc.jpg" },
-                { id: 616037, title: "Thor: Love and Thunder", poster_path: "/pIkRyD18kl4FhoCNQuWxWu5cBLM.jpg", backdrop_path: "/j9XiwXN9t512bH1Q1JjF1Z5X6V7.jpg" }
-            ],
-            midnight: [
-                { id: 348, title: "Alien", poster_path: "/vfrQk5IPloGg1v9Rzbh2Eg3VGyM.jpg", backdrop_path: "/g8aNqf05u4k1e1s2t3r4q5p6o7n.jpg" },
-                { id: 423108, title: "The Conjuring", poster_path: "/wVYREutTvI2tmxrWh3rHPmuV30l.jpg", backdrop_path: "/a1b2c3d4e5f6g7h8i9j0k1l2m3.jpg" },
-                { id: 565, title: "The Ring", poster_path: "/uQxjzUuVGl9Cg1Hq1N4e4G7j4f.jpg", backdrop_path: "/z9y8x7w6v5u4t3s2r1q0p9o8n7.jpg" }
-            ]
-        };
-
-        Object.values(dbCategories).forEach(list => {
-            list.forEach(m => allLoadedMovies.set(m.id, m));
-        });
-
-        loadCategory('trending');
-            function loadCategory(type, el) {
-            if(el) {
-                document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
-                el.classList.add('active');
-            }
-            
-            document.getElementById('homeView').style.display = 'block';
-            document.getElementById('watchView').style.display = 'none';
-            document.getElementById('historySection').style.display = 'none';
-            document.getElementById('settingsSection').style.display = 'none';
-            document.getElementById('searchDropdown').style.display = 'none';
-
-            let titles = {
-                trending: "Trending Masterpieces",
-                bollywood: "Bollywood Collection",
-                hollywood: "Hollywood Collection",
-                south: "South Indian Collection",
-                netflix: "Netflix Collection",
-                hulu: "Hulu Collection",
-                lionsgate: "Lionsgate Collection",
-                truecrime: "True Crime & Investigation",
-                appletv: "Apple TV+ Collection",
-                hbomax: "HBO Max Collection",
-                animation: "Animation Collection",
-                anime: "Anime Collection",
-                peacock: "Peacock Collection",
-                paramount: "Paramount+ Collection"
-            };
-
-            currentMovieList = dbCategories[type] || dbCategories['trending'];
-            currentMovieList.forEach(m => allLoadedMovies.set(m.id, m));
-
-            let sliderItems = currentMovieList.slice(0, 3);
-            
-            document.getElementById('heroSlider').style.display = 'flex';
-            renderSlider(sliderItems);
-            document.getElementById('gridTitle').innerText = titles[type] || "Featured Collection";
-            renderGrid(currentMovieList, 'moviesGrid');
+        // Automatically fetch movies.json generated by Python script
+        function loadMoviesData() {
+            fetch('movies.json')
+                .then(response => response.json())
+                .then(data => {
+                    currentMovieList = data;
+                    currentMovieList.forEach(m => allLoadedMovies.set(m.id, m));
+                    
+                    let sliderItems = currentMovieList.slice(0, 3);
+                    renderSlider(sliderItems);
+                    renderGrid(currentMovieList, 'moviesGrid');
+                })
+                .catch(error => {
+                    console.error("Error loading movies.json:", error);
+                    document.getElementById('moviesGrid').innerHTML = '<p style="padding:16px; font-size:12px; color:#aaa;">Please upload movies.json file to GitHub repository.</p>';
+                });
         }
 
-        function loadStudio(studioName) {
-            document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
-            document.getElementById('homeView').style.display = 'block';
-            document.getElementById('watchView').style.display = 'none';
-            document.getElementById('historySection').style.display = 'none';
-            document.getElementById('settingsSection').style.display = 'none';
-            document.getElementById('heroSlider').style.display = 'none';
-            document.getElementById('searchDropdown').style.display = 'none';
-            
-            document.getElementById('gridTitle').innerText = `${studioName} Collection`;
-            let matches = Array.from(allLoadedMovies.values()).filter(m => m.title.toLowerCase().includes(studioName.toLowerCase()));
-            currentMovieList = matches.length > 0 ? matches : dbCategories['trending'];
-            renderGrid(currentMovieList, 'moviesGrid');
-        }
-
-        function loadMidnight() {
-            document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
-            document.getElementById('homeView').style.display = 'block';
-            document.getElementById('watchView').style.display = 'none';
-            document.getElementById('historySection').style.display = 'none';
-            document.getElementById('settingsSection').style.display = 'none';
-            document.getElementById('heroSlider').style.display = 'none';
-            document.getElementById('searchDropdown').style.display = 'none';
-
-            document.getElementById('gridTitle').innerText = "🔥 Midnight Horror & Adult Zone (18+)";
-            currentMovieList = dbCategories['midnight'];
-            renderGrid(currentMovieList, 'moviesGrid');
-        }
+        loadMoviesData();
 
         function renderSlider(items) {
             const slider = document.getElementById('heroSlider');
@@ -346,7 +178,8 @@
                 grid.appendChild(card);
             });
         }
-            function openPlayer(id) {
+
+        function openPlayer(id) {
             currentId = id;
             serverNum = 1;
 
@@ -363,11 +196,10 @@
             document.getElementById('watchMeta').innerText = `HD Stream • Multi-Server Switchable`;
 
             setServerPlayer();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({ top: 0, behavior: 'smooth' --> });
             saveHistory(id, title);
 
             let recs = currentMovieList.filter(m => m.id !== id);
-            if(recs.length === 0) recs = dbCategories['trending'];
             renderGrid(recs.slice(0, 4), 'recommendedGrid');
         }
 
@@ -406,8 +238,6 @@
             document.getElementById('settingsSection').style.display = 'none';
             document.getElementById('searchDropdown').style.display = 'none';
             document.getElementById('homeView').style.display = 'block';
-            document.getElementById('heroSlider').style.display = 'flex';
-            loadCategory('trending');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -418,7 +248,7 @@
             
             const q = inputEl.value.trim().toLowerCase();
             if(q.length > 0) {
-                let matches = Array.from(allLoadedMovies.values()).filter(m => m.title.toLowerCase().includes(q));
+                let matches = currentMovieList.filter(m => m.title.toLowerCase().includes(q));
                 
                 dropdown.innerHTML = '';
                 if(matches.length > 0) {
@@ -492,19 +322,6 @@
                 document.getElementById('searchDropdown').style.display = 'none';
                 document.getElementById('historySection').style.display = 'block';
                 renderHistory();
-            } else if(tab === 'midnight') {
-                let pass = prompt("🔥 Enter Midnight Mode Password (18+):");
-                if(pass === "omega18") {
-                    document.querySelectorAll('.bottom-nav .nav-item').forEach(n => n.classList.remove('active'));
-                    if(el) el.classList.add('active');
-                    document.getElementById('watchView').style.display = 'none';
-                    document.getElementById('historySection').style.display = 'none';
-                    document.getElementById('searchDropdown').style.display = 'none';
-                    document.getElementById('settingsSection').style.display = 'none';
-                    loadMidnight();
-                } else {
-                    alert("❌ Incorrect Password!");
-                }
             } else if(tab === 'settings') {
                 document.getElementById('homeView').style.display = 'none';
                 document.getElementById('watchView').style.display = 'none';
