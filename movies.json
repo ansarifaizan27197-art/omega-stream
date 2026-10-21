@@ -1,32 +1,70 @@
-[
-    {
-        "id": 939243,
-        "title": "Sonic the Hedgehog 3",
-        "poster_path": "/d8RFRCAuzcGKOCzsaICg4KWjT7y.jpg",
-        "backdrop_path": "/by8z9F8y7g55v0v6uO4zRkK9V9b.jpg"
-    },
-    {
-        "id": 533535,
-        "title": "Deadpool & Wolverine",
-        "poster_path": "/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg",
-        "backdrop_path": "/y2Ca1neKke2mGPMaHzlCDNMFpsK.jpg"
-    },
-    {
-        "id": 748783,
-        "title": "The Garfield Movie",
-        "poster_path": "/p6AbOJvMQhBmffd0PIv0u8dWeY5.jpg",
-        "backdrop_path": "/vWzSuIZjZfWFm1Dk2T2f9KzH8d0.jpg"
-    },
-    {
-        "id": 653346,
-        "title": "Kingdom of the Planet of the Apes",
-        "poster_path": "/gKkl37BQuKTanygYQG1pyYgLVgf.jpg",
-        "backdrop_path": "/fqv8v6AycXKsivp1T5yKtLbGXce.jpg"
-    },
-    {
-        "id": 823464,
-        "title": "Godzilla x Kong: The New Empire",
-        "poster_path": "/z121dSTR7PY9KxK1wiIFSYZf46n.jpg",
-        "backdrop_path": "/tPImkc3UHGI8G5H2d17cWlV4t9s.jpg"
-    }
-]
+import json
+import urllib.request
+
+BEARER_TOKEN = (
+    "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyN2M3ZjJkZTU3YzUyZGRhMjI1YTkxMjg5ZjRiNmFlMiIs"
+    "Im5iZiI6MTc5MTM2MDAyNy4zMzQsInN1YiI6IjZhYzVmYzFiOGM4NWQzMmZhZmYyN2NiYSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.G_VD8Slnl18KXmgxZI5dhBQCOM15QR5TzLgGq-8H9d8"
+)
+
+# Alag-alag endpoints ya trending data fetch karne ke liye
+URL = "https://api.themoviedb.org/3/trending/movie/day"
+
+
+def fetch_movies (  ) :
+  req = urllib.request.Request(
+      URL,
+      headers={
+          "Authorization": f"Bearer {BEARER_TOKEN}",
+          "accept": "application/json",
+      },
+  )
+  with urllib.request.urlopen ( req) as response:
+    if response.status == 200:
+      data = json.loads ( response.read (  ) .decode ( "utf-8" ) )
+      movies_list = []
+      for item in data.get ( "results", [] ) :
+        title = item.get ( "title") or item.get ( "original_title", "Unknown")
+        overview = item.get ( "overview", "" ) .lower ( )
+        original_language = item.get ( "original_language", "")
+
+        # Category automatic detect karne ka logic
+        category = "hollywood"
+        if (
+            "marvel" in title.lower ( )
+            or "avengers" in title.lower ( )
+            or "spider" in title.lower ( )
+            or "deadpool" in title.lower ( )
+        ):
+          category = "marvel"
+        elif "disney" in overview or "animation" in overview:
+          category = "disney"
+        elif original_language == "hi":
+          category = "bollywood"
+        elif original_language in ["ta", "te", "ml", "kn"]:
+          category = "south"
+
+        movie_data = {
+            "id": item.get ( "id" ) ,
+            "title": title,
+            "poster_path": (
+                "https://image.tmdb.org/t/p/w500" + item.get ( "poster_path")
+                if item.get ( "poster_path")
+                else ""
+            ),
+            "backdrop_path": (
+                "https://image.tmdb.org/t/p/w1280"
+                + item.get ( "backdrop_path")
+                if item.get ( "backdrop_path")
+                else ""
+            ),
+            "category": category,
+        }
+        movies_list.append ( movie_data)
+
+      with open ( "movies.json", "w", encoding="utf-8") as f:
+        json.dump ( movies_list, f, ensure_ensure_ascii=False, indent=4)
+      print ( f"Success! {len ( movies_list ) } movies saved with proper categories.")
+
+
+if __name__ == "__main__":
+  fetch_movies ( )
