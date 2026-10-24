@@ -1,409 +1,238 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Omega Stream</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background-color: #141414; color: #fff; font-family: Arial, sans-serif; padding-bottom: 70px; }
-
-        .navbar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #181818; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #282828; }
-        .logo { font-size: 16px; font-weight: bold; color: #e50914; cursor: pointer; letter-spacing: 1px; }
-        
-        .search-container { position: relative; }
-        .search-box input { width: 180px; background: #262626; border: 1px solid #404040; padding: 8px 12px; border-radius: 4px; color: #fff; font-size: 12px; outline: none; }
-        
-        .search-dropdown { position: absolute; top: 40px; right: 0; width: 260px; background: #1f1f1f; border: 1px solid #444; border-radius: 6px; z-index: 9999; max-height: 250px; overflow-y: auto; display: none; box-shadow: 0 8px 24px rgba(0,0,0,0.9); }
-        .search-suggestion-item { padding: 10px 14px; font-size: 12px; border-bottom: 1px solid #2a2a2a; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
-        .search-suggestion-item:hover { background: #333; }
-
-        .categories { display: flex; gap: 8px; overflow-x: auto; padding: 10px 16px; background: #141414; scrollbar-width: none; }
-        .categories::-webkit-scrollbar { display: none; }
-        .cat-chip { background: #262626; color: #b3b3b3; padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: bold; white-space: nowrap; cursor: pointer; flex-shrink: 0; }
-        .cat-chip.active { background: #fff; color: #000; }
-
-        #homeView { display: block; }
-        
-        .hero-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; gap: 12px; padding: 10px 16px; }
-        .hero-slider::-webkit-scrollbar { display: none; }
-        .hero-banner { min-width: calc(100% - 32px); width: calc(100% - 32px); height: 350px; border-radius: 8px; overflow: hidden; position: relative; background: #000; scroll-snap-align: center; flex-shrink: 0; box-shadow: 0 6px 20px rgba(0,0,0,0.8); }
-        .hero-img { width: 100%; height: 100%; object-fit: cover; }
-        .hero-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 40px 16px 16px; background: linear-gradient(transparent, rgba(20,20,20,0.98)); }
-        .hero-title { font-size: 18px; font-weight: bold; margin-bottom: 8px; color: #fff; }
-        .play-btn { background: #fff; color: #000; font-weight: bold; font-size: 11px; padding: 8px 16px; border-radius: 4px; display: inline-block; cursor: pointer; }
-
-        .section-title { margin: 18px 16px 8px; font-size: 13px; font-weight: bold; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; }
-        
-        .studios-row { display: flex; gap: 8px; overflow-x: auto; padding: 0 16px; scrollbar-width: none; }
-        .studios-row::-webkit-scrollbar { display: none; }
-        .studio-btn { min-width: 90px; height: 42px; background: #222; border: 1px solid #333; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; cursor: pointer; color: #fff; flex-shrink: 0; }
-
-        .movies-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; padding: 0 16px; margin-top: 8px; }
-        .movie-card { background: #1f1f1f; border-radius: 6px; overflow: hidden; cursor: pointer; border: 1px solid #2a2a2a; }
-        .movie-card img { width: 100%; height: 195px; object-fit: cover; display: block; }
-        .movie-info { padding: 8px; }
-        .movie-name { font-size: 11px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
-
-        #watchView { display: none; padding: 16px; }
-        .back-btn { background: #262626; color: #fff; border: 1px solid #404040; padding: 6px 14px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; margin-bottom: 14px; display: inline-block; }
-        
-        .player-container { position: relative; padding-bottom: 56.25%; height: 0; background: #000; border-radius: 8px; overflow: hidden; border: 1px solid #333; margin-bottom: 12px; }
-        .player-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
-        
-        .watch-controls { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
-        .server-btn { background: #e50914; color: #fff; border: none; padding: 8px 14px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px; text-decoration: none; display: inline-block; text-align: center; }
-        .server-btn.secondary { background: #262626; border: 1px solid #404040; }
-
-        .watch-title { font-size: 18px; font-weight: bold; margin-bottom: 6px; color: #fff; }
-        .watch-meta { font-size: 11px; color: #aaa; margin-bottom: 14px; }
-
-        #historySection, #settingsSection { display: none; padding: 16px; }
-        .history-item { display: flex; align-items: center; justify-content: space-between; background: #1f1f1f; padding: 12px; border-radius: 6px; margin-bottom: 8px; border: 1px solid #2a2a2a; }
-        .del-btn { background: #e50914; color: #fff; border: none; padding: 6px 10px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold; }
-
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #181818; border-top: 1px solid #282828; display: flex; justify-content: space-around; padding: 8px 0; z-index: 1000; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #808080; font-size: 10px; cursor: pointer; }
-        .nav-item.active { color: #fff; font-weight: bold; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #141414;
+            color: #ffffff;
+            padding-bottom: 50px;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 4%;
+            background-color: #000000;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #e50914;
+            letter-spacing: 1px;
+        }
+        .search-container input {
+            padding: 10px 15px;
+            width: 250px;
+            border-radius: 4px;
+            border: none;
+            background: #333;
+            color: #fff;
+            outline: none;
+        }
+        .banner {
+            height: 400px;
+            background: linear-gradient(to top, #141414, transparent), url('https://image.tmdb.org/t/p/w1280/y2Ca1neKke2mGPMaHzlCDNMFpsK.jpg') no-repeat center center/cover;
+            display: flex;
+            align-items: flex-end;
+            padding: 40px;
+        }
+        .banner-content h1 {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        .section-title {
+            padding: 20px 4% 10px;
+            font-size: 22px;
+            border-bottom: 2px solid #e50914;
+            display: inline-block;
+            margin: 20px 4% 10px;
+        }
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            padding: 20px 4%;
+        }
+        .movie-card {
+            background: #1f1f1f;
+            border-radius: 6px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .movie-card:hover {
+            transform: scale(1.05);
+        }
+        .movie-card img {
+            width: 100%;
+            height: 270px;
+            object-fit: cover;
+        }
+        .movie-card h3 {
+            padding: 12px;
+            font-size: 15px;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        /* Modal Player Styling */
+        #playerModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        #playerModal iframe {
+            width: 80%;
+            height: 70%;
+            border: none;
+            border-radius: 8px;
+        }
+        .close-btn {
+            margin-top: 20px;
+            padding: 10px 25px;
+            background: #e50914;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
 
-    <div class="navbar">
-        <div class="logo" onclick="goHome()">OMEGA STREAM</div>
+    <header>
+        <div class="logo">OMEGA STREAM</div>
         <div class="search-container">
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Search movies..." oninput="handleSearchInput()" autocomplete="off">
-            </div>
-            <div id="searchDropdown" class="search-dropdown"></div>
+            <input type="text" id="searchBox" placeholder="Search movies..." onkeyup="searchMovies()">
+        </div>
+    </header>
+
+    <div class="banner">
+        <div class="banner-content">
+            <h1>Deadpool & Wolverine</h1>
+            <p>Experience the ultimate crossover event on Omega Stream.</p>
         </div>
     </div>
 
-    <div id="homeView">
-        <div class="categories">
-            <div class="cat-chip active" onclick="filterCategory('all', this)">Trending</div>
-            <div class="cat-chip" onclick="filterCategory('marvel', this)">Marvel</div>
-            <div class="cat-chip" onclick="filterCategory('disney', this)">Disney+</div>
-            <div class="cat-chip" onclick="filterCategory('bollywood', this)">Bollywood</div>
-            <div class="cat-chip" onclick="filterCategory('hollywood', this)">Hollywood</div>
-            <div class="cat-chip" onclick="filterCategory('south', this)">South Indian</div>
+    <h2 class="section-title">Trending Movies & Shows</h2>
+    <div class="movies-grid" id="moviesContainer">
+        <!-- Marvel & Hollywood -->
+        <div class="movie-card" onclick="playMovie('Deadpool & Wolverine', 'https://www.youtube.com/embed/73_1biulkfk')">
+            <img src="https://image.tmdb.org/t/p/w500/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg" alt="Deadpool & Wolverine">
+            <h3>Deadpool & Wolverine</h3>
+        </div>
+        <div class="movie-card" onclick="playMovie('Spider-Man: No Way Home', 'https://www.youtube.com/embed/JfVOs4VSpmA')">
+            <img src="https://image.tmdb.org/t/p/w500/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg" alt="Spider-Man: No Way Home">
+            <h3>Spider-Man: No Way Home</h3>
+        </div>
+        <div class="movie-card" onclick="playMovie('Interstellar', 'https://www.youtube.com/embed/zSWdZVtXT7E')">
+            <img src="https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg" alt="Interstellar">
+            <h3>Interstellar</h3>
         </div>
 
-        <div class="hero-slider" id="heroSlider"></div>
-
-        <div class="section-title">Studios & Genres</div>
-        <div class="studios-row">
-            <div class="studio-btn" onclick="filterStudio('Marvel')">Marvel</div>
-            <div class="studio-btn" onclick="filterStudio('Action')">Action</div>
-            <div class="studio-btn" onclick="filterStudio('Sci-Fi')">Sci-Fi</div>
-            <div class="studio-btn" onclick="filterStudio('Thriller')">Thriller</div>
+        <!-- Bollywood & South -->
+        <div class="movie-card" onclick="playMovie('Animal', 'https://www.youtube.com/embed/8FkLRUJj2zk')">
+            <img src="https://image.tmdb.org/t/p/w500/hr9rjahw30lci55N1aQdO4a7B8w.jpg" alt="Animal">
+            <h3>Animal</h3>
+        </div>
+        <div class="movie-card" onclick="playMovie('Drishyam', 'https://www.youtube.com/embed/AVc942wPb9c')">
+            <img src="https://image.tmdb.org/t/p/w500/mYLOqiSrsq7jsuEaT2VvL2nZqI4.jpg" alt="Drishyam">
+            <h3>Drishyam</h3>
+        </div>
+        <div class="movie-card" onclick="playMovie('HIT The 3rd Case', 'https://www.youtube.com/embed/dQw4w9WgXcQ')">
+            <img src="https://image.tmdb.org/t/p/w500/2CAL2433ZeIihfX1Hb2139CX0dr.jpg" alt="HIT The 3rd Case">
+            <h3>HIT The 3rd Case</h3>
+        </div>
+        <div class="movie-card" onclick="playMovie('The Paradise', 'https://image.tmdb.org/t/p/w500/jdLsBo6ZH7kZcE7q6819Rk91y2d.jpg')">
+            <img src="https://image.tmdb.org/t/p/w500/jdLsBo6ZH7kZcE7q6819Rk91y2d.jpg" alt="The Paradise">
+            <h3>The Paradise</h3>
         </div>
 
-        <div class="section-title" id="gridTitle">Trending Masterpieces</div>
-        <div class="movies-grid" id="moviesGrid"></div>
+        <!-- Series & Web Shows -->
+        <div class="movie-card" onclick="playMovie('Wednesday', 'https://www.youtube.com/embed/Q73UhUTs6y0')">
+            <img src="https://image.tmdb.org/t/p/w500/9PFonBhy4cQy7Jz20NpMygczOkv.jpg" alt="Wednesday">
+            <h3>Wednesday</h3>
+        </div>
+
+        <!-- Horror & Thriller (The Conjuring Universe) -->
+        <div class="movie-card" onclick="playMovie('The Conjuring', 'https://www.youtube.com/embed/k10ETkdJBKc')">
+            <img src="https://image.tmdb.org/t/p/w500/wVYREutTvI2tmxr6ujrHT704wGF.jpg" alt="The Conjuring">
+            <h3>The Conjuring</h3>
+        </div>
+        <div class="movie-card" onclick="playMovie('The Conjuring 2', 'https://www.youtube.com/embed/VFsmuRPClr4')">
+            <img src="https://image.tmdb.org/t/p/w500/zANvjvTgaPSq6Z2aMh50Y7B0tN.jpg" alt="The Conjuring 2">
+            <h3>The Conjuring 2</h3>
+        </div>
+        <div class="movie-card" onclick="playMovie('The Conjuring: The Devil Made Me Do It', 'https://www.youtube.com/embed/h9Q4zZS2vCw')">
+            <img src="https://image.tmdb.org/t/p/w500/xbSuFiJbbBWCkyCCKIMfuDCA4yV.jpg" alt="The Conjuring 3">
+            <h3>The Conjuring 3</h3>
+        </div>
+
+        <!-- Others / Sci-Fi / Backrooms / Supergirl -->
+        <div class="movie-card" onclick="playMovie('Backrooms', 'https://www.youtube.com/embed/Hkxpt9nWjds')">
+            <img src="https://image.tmdb.org/t/p/w500/iQFcwSGbZXMkeyKrxbPnwnRo5fl.jpg" alt="Backrooms">
+            <h3>Backrooms</h3>
+        </div>
+        <div class="movie-card" onclick="playMovie('Supergirl', 'https://www.youtube.com/embed/m7w_HgW6a7s')">
+            <img src="https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg" alt="Supergirl">
+            <h3>Supergirl</h3>
+        </div>
     </div>
-        <div id="watchView">
-        <div class="back-btn" onclick="goHome()">← Back to Home</div>
-        <div class="player-container">
-            <iframe id="videoPlayer" src="" allowfullscreen></iframe>
-        </div>
-        <div class="watch-controls">
-            <button class="server-btn secondary" onclick="switchServer()" id="serverIndicator">Server: VidSrc API</button>
-            <a id="directWatchBtn" href="" target="_blank" class="server-btn">🚀 Open External Player</a>
-        </div>
-        <div class="watch-title" id="watchTitle">Movie Title</div>
-        <div class="watch-meta" id="watchMeta">HD Stream • Multi-Server Switchable</div>
 
-        <div class="section-title" style="margin-left:0; margin-top:20px;">You May Also Like</div>
-        <div class="movies-grid" id="recommendedGrid" style="padding:0;"></div>
-    </div>
-
-    <div id="historySection">
-        <div class="section-title" style="margin-left:0; margin-bottom:10px;">Watch History</div>
-        <div id="historyList"></div>
-    </div>
-
-    <div id="settingsSection">
-        <div class="section-title" style="margin-left:0; margin-bottom:10px;">App Settings</div>
-        <div style="background:#1f1f1f; padding:14px; border-radius:6px; font-size:12px; margin-bottom:10px;">
-            <p style="font-weight:bold; margin-bottom:6px;">Omega Stream v8.0</p>
-            <p style="color:#aaa;">Custom Clean Categories Active.</p>
-        </div>
-        <button class="server-btn" onclick="localStorage.clear(); alert('Cache cleared!'); renderHistory();">Clear Watch History</button>
-    </div>
-
-    <div class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('home', this)"><span>🏠 Home</span></div>
-        <div class="nav-item" onclick="switchTab('history', this)"><span>📜 History</span></div>
-        <div class="nav-item" onclick="switchTab('settings', this)"><span>⚙️ Settings</span></div>
+    <!-- Video Player Modal -->
+    <div id="playerModal">
+        <iframe id="videoPlayer" src="" allowfullscreen></iframe>
+        <button class="close-btn" onclick="closePlayer()">Close</button>
     </div>
 
     <script>
-        let currentId = null;
-        let serverNum = 1;
-        let allMovies = [];
-        let currentMovieList = [];
-        let allLoadedMovies = new Map();
-
-        function loadMoviesData() {
-            fetch('movies.json')
-                .then(response => response.json())
-                .then(data => {
-                    allMovies = data;
-                    allMovies.forEach(m => allLoadedMovies.set(m.id, m));
-                    currentMovieList = allMovies;
-                    
-                    let sliderItems = currentMovieList.slice(0, 3);
-                    renderSlider(sliderItems);
-                    renderGrid(currentMovieList, 'moviesGrid');
-                })
-                .catch(error => {
-                    console.error("Error loading movies.json:", error);
-                    document.getElementById('moviesGrid').innerHTML = '<p style="padding:16px; font-size:12px; color:#aaa;">Please ensure movies.json is uploaded in your GitHub repository.</p>';
-                });
-        }
-
-        loadMoviesData();
-
-        function filterCategory(type, el) {
-            if(el) {
-                document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
-                el.classList.add('active');
-            }
-            
-            document.getElementById('homeView').style.display = 'block';
-            document.getElementById('watchView').style.display = 'none';
-            document.getElementById('historySection').style.display = 'none';
-            document.getElementById('settingsSection').style.display = 'none';
-            document.getElementById('searchDropdown').style.display = 'none';
-            document.getElementById('heroSlider').style.display = 'flex';
-
-            if(type === 'all') {
-                currentMovieList = allMovies;
-                document.getElementById('gridTitle').innerText = "Trending Masterpieces";
-            } else {
-                currentMovieList = allMovies.filter(m => {
-                    let title = (m.title || "").toLowerCase();
-                    if(type === 'marvel') return title.includes('spider') || title.includes('avengers') || title.includes('deadpool') || title.includes('thor') || title.includes('iron man');
-                    if(type === 'disney') return title.includes('disney') || title.includes('animation') || title.includes('inside out') || title.includes('mario') || title.includes('frozen');
-                    if(type === 'bollywood') return title.includes('pathaan') || title.includes('jawan') || title.includes('animal') || title.includes('stree') || title.includes('dunki');
-                    if(type === 'hollywood') return true;
-                    if(type === 'south') return title.includes('rrr') || title.includes('kgf') || title.includes('pushpa') || title.includes('kalki');
-                    return true;
-                });
-                if(currentMovieList.length === 0) currentMovieList = allMovies;
-                document.getElementById('gridTitle').innerText = `${type.toUpperCase()} Collection`;
-            }
-
-            renderSlider(currentMovieList.slice(0, 3));
-            renderGrid(currentMovieList, 'moviesGrid');
-        }
-
-        function filterStudio(studioName) {
-            document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
-            document.getElementById('homeView').style.display = 'block';
-            document.getElementById('watchView').style.display = 'none';
-            document.getElementById('historySection').style.display = 'none';
-            document.getElementById('settingsSection').style.display = 'none';
-            document.getElementById('heroSlider').style.display = 'none';
-            document.getElementById('searchDropdown').style.display = 'none';
-            
-            document.getElementById('gridTitle').innerText = `${studioName} Collection`;
-            let matches = allMovies.filter(m => (m.title || "").toLowerCase().includes(studioName.toLowerCase()));
-            currentMovieList = matches.length > 0 ? matches : allMovies;
-            renderGrid(currentMovieList, 'moviesGrid');
-        }
-
-        function renderSlider(items) {
-            const slider = document.getElementById('heroSlider');
-            if(!slider) return;
-            slider.innerHTML = '';
-            items.forEach(item => {
-                let title = item.title || "Movie";
-                let backdrop = item.backdrop_path ? `https://image.tmdb.org/t/p/w1280${item.backdrop_path}` : '';
-                const banner = document.createElement('div');
-                banner.className = 'hero-banner';
-                banner.innerHTML = `
-                    <img class="hero-img" src="${backdrop}" alt="${title}" onerror="this.src='https://via.placeholder.com/1280x720/1f1f1f/ffffff?text=Omega+Stream'">
-                    <div class="hero-overlay">
-                        <div class="hero-title">${title}</div>
-                        <div class="play-btn" onclick="openPlayer(${item.id})">▶ Play Now</div>
-                    </div>
-                `;
-                slider.appendChild(banner);
-            });
-        }
-
-        function renderGrid(items, elementId) {
-            const grid = document.getElementById(elementId);
-            if(!grid) return;
-            grid.innerHTML = '';
-            items.forEach(item => {
-                let title = item.title || "Movie";
-                let poster = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : 'https://via.placeholder.com/300x450/1f1f1f/ffffff?text=Omega+Stream';
-                const card = document.createElement('div');
-                card.className = 'movie-card';
-                card.onclick = () => openPlayer(item.id);
-                card.innerHTML = `
-                    <img src="${poster}" alt="${title}" onerror="this.src='https://via.placeholder.com/300x450/1f1f1f/ffffff?text=Omega+Stream'">
-                    <div class="movie-info">
-                        <div class="movie-name">${title}</div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        function openPlayer(id) {
-            currentId = id;
-            serverNum = 1;
-
-            let item = allLoadedMovies.get(id);
-            let title = item ? item.title : "Movie Stream";
-
-            document.getElementById('homeView').style.display = 'none';
-            document.getElementById('historySection').style.display = 'none';
-            document.getElementById('settingsSection').style.display = 'none';
-            document.getElementById('searchDropdown').style.display = 'none';
-            document.getElementById('watchView').style.display = 'block';
-
-            document.getElementById('watchTitle').innerText = title;
-            document.getElementById('watchMeta').innerText = `HD Stream • Multi-Server Switchable`;
-
-            setServerPlayer();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            saveHistory(id, title);
-
-            let recs = currentMovieList.filter(m => m.id !== id);
-            renderGrid(recs.slice(0, 4), 'recommendedGrid');
-        }
-
-        function setServerPlayer() {
+        function playMovie(title, url) {
+            const modal = document.getElementById('playerModal');
             const iframe = document.getElementById('videoPlayer');
-            const directBtn = document.getElementById('directWatchBtn');
-            const serverIndicator = document.getElementById('serverIndicator');
+            iframe.src = url;
+            modal.style.display = 'flex';
+        }
+
+        function closePlayer() {
+            const modal = document.getElementById('playerModal');
+            const iframe = document.getElementById('videoPlayer');
+            iframe.src = '';
+            modal.style.display = 'none';
+        }
+
+        function searchMovies() {
+            let input = document.getElementById('searchBox').value.toLowerCase();
+            let cards = document.getElementsByClassName('movie-card');
             
-            let targetUrl = '';
-            let serverName = '';
-
-            if(serverNum === 1) {
-                targetUrl = `https://vidsrc.xyz/embed/movie?tmdb=${currentId}`;
-                serverName = 'Server: VidSrc API';
-            } else if(serverNum === 2) {
-                targetUrl = `https://multimbed.mov/directstream.php?video_id=${currentId}&tmdb=1`;
-                serverName = 'Server: MultiEmbed';
-            } else {
-                targetUrl = `https://vidsrc.to/embed/movie/${currentId}`;
-                serverName = 'Server: VidSrc TO';
-            }
-
-            if(iframe) iframe.src = targetUrl;
-            if(directBtn) directBtn.href = targetUrl;
-            if(serverIndicator) serverIndicator.innerText = serverName;
-        }
-
-        function switchServer() {
-            serverNum = (serverNum % 3) + 1;
-            setServerPlayer();
-        }
-
-        function goHome() {
-            document.getElementById('watchView').style.display = 'none';
-            document.getElementById('historySection').style.display = 'none';
-            document.getElementById('settingsSection').style.display = 'none';
-            document.getElementById('searchDropdown').style.display = 'none';
-            document.getElementById('homeView').style.display = 'block';
-            document.getElementById('heroSlider').style.display = 'flex';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function handleSearchInput() {
-            const inputEl = document.getElementById('searchInput');
-            const dropdown = document.getElementById('searchDropdown');
-            if(!inputEl || !dropdown) return;
-            
-            const q = inputEl.value.trim().toLowerCase();
-            if(q.length > 0) {
-                let matches = allMovies.filter(m => (m.title || "").toLowerCase().includes(q));
-                
-                dropdown.innerHTML = '';
-                if(matches.length > 0) {
-                    dropdown.style.display = 'block';
-                    matches.slice(0, 6).forEach(item => {
-                        let title = item.title;
-                        const div = document.createElement('div');
-                        div.className = 'search-suggestion-item';
-                        div.innerText = title;
-                        div.onclick = () => {
-                            inputEl.value = '';
-                            dropdown.style.display = 'none';
-                            openPlayer(item.id);
-                        };
-                        dropdown.appendChild(div);
-                    });
+            for (let i = 0; i < cards.length; i++) {
+                let title = cards[i].getElementsByTagName('h3')[0].innerText.toLowerCase();
+                if (title.includes(input)) {
+                    cards[i].style.display = "";
                 } else {
-                    dropdown.style.display = 'none';
+                    cards[i].style.display = "none";
                 }
-            } else {
-                dropdown.style.display = 'none';
-            }
-        }
-
-        function saveHistory(id, title) {
-            let hist = JSON.parse(localStorage.getItem('omega_history') || '[]');
-            hist = hist.filter(i => i.id !== id);
-            hist.unshift({ id, title, type: 'movie', date: new Date().toLocaleDateString() });
-            localStorage.setItem('omega_history', JSON.stringify(hist));
-        }
-
-        function renderHistory() {
-            const list = document.getElementById('historyList');
-            if(!list) return;
-            let hist = [];
-            try { hist = JSON.parse(localStorage.getItem('omega_history') || '[]'); } catch(e) {}
-            
-            list.innerHTML = hist.length === 0 ? '<p style="font-size:11px; color:#808080;">No history found.</p>' : '';
-            hist.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'history-item';
-                div.innerHTML = `
-                    <div onclick="openPlayer(${item.id})" style="cursor:pointer; flex:1;">
-                        <div style="font-size:11px; font-weight:bold;">${item.title}</div>
-                        <div style="font-size:9px; color:#808080;">MOVIE • ${item.date}</div>
-                    </div>
-                    <button class="del-btn" onclick="deleteHistory(${item.id})">Delete</button>
-                `;
-                list.appendChild(div);
-            });
-        }
-
-        function deleteHistory(id) {
-            let hist = JSON.parse(localStorage.getItem('omega_history') || '[]');
-            hist = hist.filter(i => i.id !== id);
-            localStorage.setItem('omega_history', JSON.stringify(hist));
-            renderHistory();
-        }
-
-        function switchTab(tab, el) {
-            if(el) {
-                document.querySelectorAll('.bottom-nav .nav-item').forEach(n => n.classList.remove('active'));
-                el.classList.add('active');
-            }
-            if(tab === 'home') {
-                goHome();
-            } else if(tab === 'history') {
-                document.getElementById('homeView').style.display = 'none';
-                document.getElementById('watchView').style.display = 'none';
-                document.getElementById('settingsSection').style.display = 'none';
-                document.getElementById('searchDropdown').style.display = 'none';
-                document.getElementById('historySection').style.display = 'block';
-                renderHistory();
-            } else if(tab === 'settings') {
-                document.getElementById('homeView').style.display = 'none';
-                document.getElementById('watchView').style.display = 'none';
-                document.getElementById('historySection').style.display = 'none';
-                document.getElementById('searchDropdown').style.display = 'none';
-                document.getElementById('settingsSection').style.display = 'block';
             }
         }
     </script>
