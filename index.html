@@ -103,10 +103,11 @@
             flex-direction: column;
         }
         #playerModal iframe {
-            width: 80%;
-            height: 70%;
+            width: 85%;
+            height: 75%;
             border: none;
             border-radius: 8px;
+            background: #000;
         }
         .close-btn {
             margin-top: 20px;
@@ -132,72 +133,58 @@
     <div class="banner">
         <div class="banner-content">
             <h1>Deadpool & Wolverine</h1>
-            <p>Experience the ultimate crossover event on Omega Stream.</p>
+            <p>Experience the ultimate streaming on Omega Stream.</p>
         </div>
     </div>
 
     <h2 class="section-title">Trending Movies & Shows</h2>
     <div class="movies-grid" id="moviesContainer">
         <!-- Marvel & Hollywood -->
-        <div class="movie-card" onclick="playMovie('Deadpool & Wolverine', 'https://www.youtube.com/embed/73_1biulkfk')">
+        <div class="movie-card" onclick="playMovie('https://vidsrc.xyz/embed/movie?tmdb=533535')">
             <img src="https://image.tmdb.org/t/p/w500/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg" alt="Deadpool & Wolverine">
             <h3>Deadpool & Wolverine</h3>
         </div>
-        <div class="movie-card" onclick="playMovie('Spider-Man: No Way Home', 'https://www.youtube.com/embed/JfVOs4VSpmA')">
+        <div class="movie-card" onclick="playMovie('https://vidsrc.xyz/embed/movie?tmdb=634649')">
             <img src="https://image.tmdb.org/t/p/w500/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg" alt="Spider-Man: No Way Home">
             <h3>Spider-Man: No Way Home</h3>
         </div>
-        <div class="movie-card" onclick="playMovie('Interstellar', 'https://www.youtube.com/embed/zSWdZVtXT7E')">
+        <div class="movie-card" onclick="playMovie('https://vidsrc.xyz/embed/movie?tmdb=157336')">
             <img src="https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg" alt="Interstellar">
             <h3>Interstellar</h3>
         </div>
 
         <!-- Bollywood & South -->
-        <div class="movie-card" onclick="playMovie('Animal', 'https://www.youtube.com/embed/8FkLRUJj2zk')">
-            <img src="https://image.tmdb.org/t/p/w500/hr9rjahw30lci55N1aQdO4a7B8w.jpg" alt="Animal">
+        <div class="movie-card" onclick="playMovie('https://vidsrc.xyz/embed/movie?tmdb=934632')">
+            <img src="https://image.tmdb.org/t/p/w500/pFlaoHTZeyNkG83vxsAJiGzfSsa.jpg" alt="Animal">
             <h3>Animal</h3>
         </div>
-        <div class="movie-card" onclick="playMovie('Drishyam', 'https://www.youtube.com/embed/AVc942wPb9c')">
-            <img src="https://image.tmdb.org/t/p/w500/mYLOqiSrsq7jsuEaT2VvL2nZqI4.jpg" alt="Drishyam">
+        <div class="movie-card" onclick="playMovie('https://vidsrc.xyz/embed/movie?tmdb=401314')">
+            <img src="https://image.tmdb.org/t/p/w500/6uhavAb8k8CrvgMCa4J9vVwUu0R.jpg" alt="Drishyam">
             <h3>Drishyam</h3>
         </div>
-        <div class="movie-card" onclick="playMovie('HIT The 3rd Case', 'https://www.youtube.com/embed/dQw4w9WgXcQ')">
+        <div class="movie-card" onclick="playMovie('https://vidsrc.xyz/embed/movie?tmdb=1156555')">
             <img src="https://image.tmdb.org/t/p/w500/2CAL2433ZeIihfX1Hb2139CX0dr.jpg" alt="HIT The 3rd Case">
             <h3>HIT The 3rd Case</h3>
         </div>
-        <div class="movie-card" onclick="playMovie('The Paradise', 'https://image.tmdb.org/t/p/w500/jdLsBo6ZH7kZcE7q6819Rk91y2d.jpg')">
-            <img src="https://image.tmdb.org/t/p/w500/jdLsBo6ZH7kZcE7q6819Rk91y2d.jpg" alt="The Paradise">
-            <h3>The Paradise</h3>
-        </div>
 
-        <!-- Series & Web Shows -->
-        <div class="movie-card" onclick="playMovie('Wednesday', 'https://www.youtube.com/embed/Q73UhUTs6y0')">
+        <!-- Series & Web Shows (Using TV embed format if needed, or movie ID) -->
+        <div class="movie-card" onclick="playMovie('https://vidsrc.xyz/embed/tv?tmdb=119051')">
             <img src="https://image.tmdb.org/t/p/w500/9PFonBhy4cQy7Jz20NpMygczOkv.jpg" alt="Wednesday">
             <h3>Wednesday</h3>
         </div>
 
-        <!-- Horror & Thriller (The Conjuring Universe) -->
-        <div class="movie-card" onclick="playMovie('The Conjuring', 'https://www.youtube.com/embed/k10ETkdJBKc')">
+        <!-- Horror & Thriller -->
+        <div class="movie-card" onclick="playMovie('https://vidsrc.xyz/embed/movie?tmdb=138843')">
             <img src="https://image.tmdb.org/t/p/w500/wVYREutTvI2tmxr6ujrHT704wGF.jpg" alt="The Conjuring">
             <h3>The Conjuring</h3>
         </div>
-        <div class="movie-card" onclick="playMovie('The Conjuring 2', 'https://www.youtube.com/embed/VFsmuRPClr4')">
+        <div class="movie-card" onclick="playMovie('https://vidsrc.xyz/embed/movie?tmdb=381288')">
             <img src="https://image.tmdb.org/t/p/w500/zANvjvTgaPSq6Z2aMh50Y7B0tN.jpg" alt="The Conjuring 2">
             <h3>The Conjuring 2</h3>
         </div>
-        <div class="movie-card" onclick="playMovie('The Conjuring: The Devil Made Me Do It', 'https://www.youtube.com/embed/h9Q4zZS2vCw')">
+        <div class="movie-card" onclick="playMovie('https://vidsrc.xyz/embed/movie?tmdb=423108')">
             <img src="https://image.tmdb.org/t/p/w500/xbSuFiJbbBWCkyCCKIMfuDCA4yV.jpg" alt="The Conjuring 3">
             <h3>The Conjuring 3</h3>
-        </div>
-
-        <!-- Others / Sci-Fi / Backrooms / Supergirl -->
-        <div class="movie-card" onclick="playMovie('Backrooms', 'https://www.youtube.com/embed/Hkxpt9nWjds')">
-            <img src="https://image.tmdb.org/t/p/w500/iQFcwSGbZXMkeyKrxbPnwnRo5fl.jpg" alt="Backrooms">
-            <h3>Backrooms</h3>
-        </div>
-        <div class="movie-card" onclick="playMovie('Supergirl', 'https://www.youtube.com/embed/m7w_HgW6a7s')">
-            <img src="https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg" alt="Supergirl">
-            <h3>Supergirl</h3>
         </div>
     </div>
 
@@ -208,7 +195,7 @@
     </div>
 
     <script>
-        function playMovie(title, url) {
+        function playMovie(url) {
             const modal = document.getElementById('playerModal');
             const iframe = document.getElementById('videoPlayer');
             iframe.src = url;
