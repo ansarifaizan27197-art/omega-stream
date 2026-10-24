@@ -20,7 +20,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 4%;
+            padding: 20px 5%;
             background-color: #000000;
             position: sticky;
             top: 0;
@@ -34,36 +34,23 @@
         }
         .search-container input {
             padding: 10px 15px;
-            width: 250px;
+            width: 240px;
             border-radius: 4px;
             border: none;
             background: #333;
             color: #fff;
             outline: none;
         }
-        .banner {
-            height: 400px;
-            background: linear-gradient(to top, #141414, transparent), url('https://image.tmdb.org/t/p/w1280/y2Ca1neKke2mGPMaHzlCDNMFpsK.jpg') no-repeat center center/cover;
-            display: flex;
-            align-items: flex-end;
-            padding: 40px;
-        }
-        .banner-content h1 {
-            font-size: 40px;
-            margin-bottom: 10px;
-        }
         .section-title {
-            padding: 20px 4% 10px;
+            padding: 25px 5% 15px;
             font-size: 22px;
-            border-bottom: 2px solid #e50914;
-            display: inline-block;
-            margin: 20px 4% 10px;
+            color: #e50914;
         }
         .movies-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
             gap: 20px;
-            padding: 20px 4%;
+            padding: 0 5%;
         }
         .movie-card {
             background: #1f1f1f;
@@ -77,18 +64,18 @@
         }
         .movie-card img {
             width: 100%;
-            height: 270px;
+            height: 240px;
             object-fit: cover;
         }
         .movie-card h3 {
-            padding: 12px;
-            font-size: 15px;
+            padding: 10px;
+            font-size: 14px;
             text-align: center;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        /* Modal Player Styling */
+        /* Modal Player */
         #playerModal {
             display: none;
             position: fixed;
@@ -96,28 +83,29 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
             z-index: 2000;
             justify-content: center;
             align-items: center;
             flex-direction: column;
         }
         #playerModal iframe {
-            width: 85%;
-            height: 75%;
+            width: 90%;
+            height: 80%;
             border: none;
             border-radius: 8px;
             background: #000;
         }
         .close-btn {
-            margin-top: 20px;
-            padding: 10px 25px;
+            margin-top: 15px;
+            padding: 10px 30px;
             background: #e50914;
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -130,72 +118,47 @@
         </div>
     </header>
 
-    <div class="banner">
-        <div class="banner-content">
-            <h1>Deadpool & Wolverine</h1>
-            <p>Experience the ultimate streaming on Omega Stream.</p>
-        </div>
-    </div>
-
     <h2 class="section-title">Trending Movies & Shows</h2>
     <div class="movies-grid" id="moviesContainer">
-        <!-- Marvel & Hollywood -->
-        <div class="movie-card" onclick="playMovie('https://vidsrc.xyz/embed/movie?tmdb=533535')">
+        <!-- Movie Cards with direct embedded player links -->
+        <div class="movie-card" onclick="openPlayer('https://vidsrc.me/embed/movie?tmdb=533535')">
             <img src="https://image.tmdb.org/t/p/w500/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg" alt="Deadpool & Wolverine">
             <h3>Deadpool & Wolverine</h3>
         </div>
-        <div class="movie-card" onclick="playMovie('https://vidsrc.xyz/embed/movie?tmdb=634649')">
+        <div class="movie-card" onclick="openPlayer('https://vidsrc.me/embed/movie?tmdb=634649')">
             <img src="https://image.tmdb.org/t/p/w500/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg" alt="Spider-Man: No Way Home">
             <h3>Spider-Man: No Way Home</h3>
         </div>
-        <div class="movie-card" onclick="playMovie('https://vidsrc.xyz/embed/movie?tmdb=157336')">
+        <div class="movie-card" onclick="openPlayer('https://vidsrc.me/embed/movie?tmdb=157336')">
             <img src="https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg" alt="Interstellar">
             <h3>Interstellar</h3>
         </div>
-
-        <!-- Bollywood & South -->
-        <div class="movie-card" onclick="playMovie('https://vidsrc.xyz/embed/movie?tmdb=934632')">
+        <div class="movie-card" onclick="openPlayer('https://vidsrc.me/embed/movie?tmdb=934632')">
             <img src="https://image.tmdb.org/t/p/w500/pFlaoHTZeyNkG83vxsAJiGzfSsa.jpg" alt="Animal">
             <h3>Animal</h3>
         </div>
-        <div class="movie-card" onclick="playMovie('https://vidsrc.xyz/embed/movie?tmdb=401314')">
+        <div class="movie-card" onclick="openPlayer('https://vidsrc.me/embed/movie?tmdb=401314')">
             <img src="https://image.tmdb.org/t/p/w500/6uhavAb8k8CrvgMCa4J9vVwUu0R.jpg" alt="Drishyam">
             <h3>Drishyam</h3>
         </div>
-        <div class="movie-card" onclick="playMovie('https://vidsrc.xyz/embed/movie?tmdb=1156555')">
-            <img src="https://image.tmdb.org/t/p/w500/2CAL2433ZeIihfX1Hb2139CX0dr.jpg" alt="HIT The 3rd Case">
-            <h3>HIT The 3rd Case</h3>
-        </div>
-
-        <!-- Series & Web Shows (Using TV embed format if needed, or movie ID) -->
-        <div class="movie-card" onclick="playMovie('https://vidsrc.xyz/embed/tv?tmdb=119051')">
+        <div class="movie-card" onclick="openPlayer('https://vidsrc.me/embed/tv?tmdb=119051')">
             <img src="https://image.tmdb.org/t/p/w500/9PFonBhy4cQy7Jz20NpMygczOkv.jpg" alt="Wednesday">
             <h3>Wednesday</h3>
         </div>
-
-        <!-- Horror & Thriller -->
-        <div class="movie-card" onclick="playMovie('https://vidsrc.xyz/embed/movie?tmdb=138843')">
+        <div class="movie-card" onclick="openPlayer('https://vidsrc.me/embed/movie?tmdb=138843')">
             <img src="https://image.tmdb.org/t/p/w500/wVYREutTvI2tmxr6ujrHT704wGF.jpg" alt="The Conjuring">
             <h3>The Conjuring</h3>
         </div>
-        <div class="movie-card" onclick="playMovie('https://vidsrc.xyz/embed/movie?tmdb=381288')">
-            <img src="https://image.tmdb.org/t/p/w500/zANvjvTgaPSq6Z2aMh50Y7B0tN.jpg" alt="The Conjuring 2">
-            <h3>The Conjuring 2</h3>
-        </div>
-        <div class="movie-card" onclick="playMovie('https://vidsrc.xyz/embed/movie?tmdb=423108')">
-            <img src="https://image.tmdb.org/t/p/w500/xbSuFiJbbBWCkyCCKIMfuDCA4yV.jpg" alt="The Conjuring 3">
-            <h3>The Conjuring 3</h3>
-        </div>
     </div>
 
-    <!-- Video Player Modal -->
+    <!-- Modal Player -->
     <div id="playerModal">
         <iframe id="videoPlayer" src="" allowfullscreen></iframe>
-        <button class="close-btn" onclick="closePlayer()">Close</button>
+        <button class="close-btn" onclick="closePlayer()">Close Player</button>
     </div>
 
     <script>
-        function playMovie(url) {
+        function openPlayer(url) {
             const modal = document.getElementById('playerModal');
             const iframe = document.getElementById('videoPlayer');
             iframe.src = url;
@@ -224,5 +187,5 @@
         }
     </script>
 </body>
-    </html>
-    
+        </html>
+        
